@@ -31,6 +31,9 @@ app_license = "MIT"
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
+doctype_js = {"Task" : "public/js/task.js"}
+
+
 # Home Pages
 # ----------
 
@@ -86,12 +89,6 @@ app_license = "MIT"
 # 		"on_trash": "method"
 #	}
 # }
-
-doc_events = {
-	"Task": {
-		"validate": "rf.hook_events.task.update_task_details",
-	}
-}
 
 # Scheduled Tasks
 # ---------------
