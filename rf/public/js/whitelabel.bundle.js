@@ -54,9 +54,9 @@ console.log('[RF Whitelabel] ========================================');
             console.log('[RF Whitelabel] get_abbr override installed successfully');
         }
 
-        // Set up the rest when frappe.ready fires
-        frappe.ready(function() {
-            console.log('[RF Whitelabel] frappe.ready fired');
+        // Set up the rest when DOM and frappe are ready
+        $(document).ready(function() {
+            console.log('[RF Whitelabel] DOM ready, setting up...');
             console.log('[RF Whitelabel] Session user:', frappe.session.user);
             console.log('[RF Whitelabel] Boot user:', frappe.boot.user);
 
@@ -86,10 +86,11 @@ console.log('[RF Whitelabel] ========================================');
             if (frappe.session.user && frappe.session.user !== 'Guest') {
                 console.log('[RF Whitelabel] Setting up user display...');
 
-                // Initial update
+                // Initial update with delay to ensure elements are rendered
                 setTimeout(function() {
+                    console.log('[RF Whitelabel] Running initial updateUserDisplay...');
                     updateUserDisplay();
-                }, 100);
+                }, 500);
 
                 // Update after toolbar loads
                 $(document).on('toolbar_setup', function() {
@@ -110,7 +111,7 @@ console.log('[RF Whitelabel] ========================================');
                     } else {
                         console.log('[RF Whitelabel] WARNING: navbar-right not found');
                     }
-                }, 500);
+                }, 1000);
             } else {
                 console.log('[RF Whitelabel] Guest user detected, skipping user display setup');
             }
@@ -137,42 +138,29 @@ console.log('[RF Whitelabel] ========================================');
 
             console.log('[RF Whitelabel] updateUserDisplay - full_name:', full_name, 'display_name:', display_name);
 
-            // Method 1: Find all text nodes with user name in navbar-right
-            $('.navbar-right').find('*').each(function() {
-                var $elem = $(this);
-                var text = $elem.text().trim();
-                // Only update leaf text nodes
-                if ($elem.children().length === 0 && text && text !== display_name) {
-                    // Check if it looks like a user name (contains letters and spaces/initials)
-                    if (/^[A-Z\s\.]+$/i.test(text) && text.length < 50) {
-                        console.log('[RF Whitelabel] Updating element:', $elem[0].tagName, 'from:', text, 'to:', display_name);
-                        $elem.text(display_name);
-                    }
-                }
-            });
+            // ONLY update the navbar user display (top-right corner)
+            // Be very specific to avoid changing notifications and other areas
 
-            // Method 2: Target specific known selectors
-            var selectors = [
-                '.navbar-right .ellipsis',
-                '.navbar-right .user-name',
-                '.navbar-right .avatar-name',
-                '#toolbar-user .ellipsis',
-                '#toolbar-user .user-name',
-                '.dropdown-navbar-user .full-name',
-                '.dropdown-navbar-user .user-name'
-            ];
+            // Target 1: The main navbar user dropdown text
+            var $navbarUser = $('.navbar-right #toolbar-user').find('> a > .ellipsis, > a > span.user-name').first();
+            if ($navbarUser.length) {
+                console.log('[RF Whitelabel] Updating navbar user dropdown:', $navbarUser[0]);
+                $navbarUser.text(display_name);
+            }
 
-            selectors.forEach(function(selector) {
-                var $elem = $(selector);
-                if ($elem.length) {
-                    console.log('[RF Whitelabel] Found selector:', selector, 'updating to:', display_name);
-                    $elem.text(display_name);
-                }
-            });
+            // Target 2: Alternative selector for navbar user
+            var $navbarUserAlt = $('.navbar .dropdown-navbar-user > a').find('.ellipsis, .user-name').first();
+            if ($navbarUserAlt.length) {
+                console.log('[RF Whitelabel] Updating navbar user (alt):', $navbarUserAlt[0]);
+                $navbarUserAlt.text(display_name);
+            }
 
-            // Method 3: Update data attributes
-            $('[data-user="' + frappe.session.user + '"]').attr('title', display_name);
-            $('.user-image, .avatar-frame').attr('title', display_name);
+            // Target 3: User display next to avatar in top-right
+            var $avatarText = $('.navbar-right').find('.avatar').next('.ellipsis, .user-name').first();
+            if ($avatarText.length) {
+                console.log('[RF Whitelabel] Updating avatar text:', $avatarText[0]);
+                $avatarText.text(display_name);
+            }
 
             console.log('[RF Whitelabel] updateUserDisplay completed');
         } catch (e) {
