@@ -22,37 +22,8 @@ console.log('[RF Whitelabel] ========================================');
     waitForFrappe(function() {
         console.log('[RF Whitelabel] Frappe object found!');
 
-        // Override frappe.get_abbr to show full first name + last initial
-        if (frappe.get_abbr) {
-            var original_get_abbr = frappe.get_abbr;
-            console.log('[RF Whitelabel] Original get_abbr found, overriding...');
-
-            frappe.get_abbr = function(name, max_length) {
-                console.log('[RF Whitelabel] get_abbr called with:', name, 'max_length:', max_length);
-
-                if (!name) return "";
-
-                var names = name.trim().split(/\s+/);
-                var abbr = "";
-
-                if (names.length > 1) {
-                    // Full first name + Last name initial
-                    abbr = names[0] + ' ' + names[names.length - 1].charAt(0).toUpperCase();
-                } else {
-                    abbr = names[0];
-                }
-
-                // If max_length is specified and abbr is longer, truncate
-                if (max_length && abbr.length > max_length) {
-                    abbr = abbr.substr(0, max_length);
-                }
-
-                console.log('[RF Whitelabel] get_abbr returning:', abbr);
-                return abbr;
-            };
-
-            console.log('[RF Whitelabel] get_abbr override installed successfully');
-        }
+        // Note: NOT overriding frappe.get_abbr to avoid affecting notifications
+        // We'll update the navbar user display directly via DOM manipulation
 
         // Set up the rest when DOM and frappe are ready
         $(document).ready(function() {
