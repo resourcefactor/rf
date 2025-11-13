@@ -2,20 +2,25 @@ li.dropdown.dropdown.dropdown-help.dropdown-mobile {
 	display: none!important;
 }
 
-/* Fix navbar user display to show full name with proper background */
-.navbar-right #toolbar-user > a {
+/* Fix navbar user display to show full name with proper background - V15 */
+.navbar .dropdown-navbar-user > .btn-reset.nav-link {
 	background: transparent !important;
-	border-radius: 0 !important;
+	border: none !important;
+	padding: 4px 8px !important;
 }
 
-.navbar-right #toolbar-user > a .avatar {
+.navbar .dropdown-navbar-user > .btn-reset.nav-link .avatar,
+.navbar .dropdown-navbar-user > .btn-reset.nav-link .avatar-frame {
 	display: none !important;
 }
 
-.navbar-right #toolbar-user > a .ellipsis,
-.navbar-right #toolbar-user > a .user-name {
+.navbar .dropdown-navbar-user > .btn-reset.nav-link .user-name-display {
+	display: inline-block !important;
 	padding: 8px 12px !important;
 	background: rgba(0, 0, 0, 0.1) !important;
 	border-radius: 4px !important;
 	color: inherit !important;
+	font-size: 14px !important;
+	font-weight: 500 !important;
+	white-space: nowrap !important;
 }

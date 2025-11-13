@@ -57,31 +57,18 @@ console.log('[RF Whitelabel] ========================================');
             if (frappe.session.user && frappe.session.user !== 'Guest') {
                 console.log('[RF Whitelabel] Setting up user display...');
 
-                // Initial update with delay to ensure elements are rendered
-                setTimeout(function() {
-                    console.log('[RF Whitelabel] Running initial updateUserDisplay...');
-                    updateUserDisplay();
-                }, 500);
-
-                // Update after toolbar loads
+                // V15: Wait for navbar to be fully rendered
+                // The toolbar_setup event is fired after navbar is created
                 $(document).on('toolbar_setup', function() {
                     console.log('[RF Whitelabel] toolbar_setup event fired');
+                    // Give it a moment for DOM to settle
                     setTimeout(updateUserDisplay, 100);
                 });
 
-                // Use mutation observer to handle dynamic updates
+                // Also try after a delay in case toolbar_setup already fired
                 setTimeout(function() {
-                    var observer = new MutationObserver(function(mutations) {
-                        console.log('[RF Whitelabel] DOM mutation detected');
-                        updateUserDisplay();
-                    });
-                    var navbarRight = document.querySelector('.navbar-right');
-                    if (navbarRight) {
-                        console.log('[RF Whitelabel] Observing navbar-right');
-                        observer.observe(navbarRight, { childList: true, subtree: true });
-                    } else {
-                        console.log('[RF Whitelabel] WARNING: navbar-right not found');
-                    }
+                    console.log('[RF Whitelabel] Running delayed updateUserDisplay...');
+                    updateUserDisplay();
                 }, 1000);
             } else {
                 console.log('[RF Whitelabel] Guest user detected, skipping user display setup');
@@ -109,33 +96,42 @@ console.log('[RF Whitelabel] ========================================');
 
             console.log('[RF Whitelabel] updateUserDisplay - full_name:', full_name, 'display_name:', display_name);
 
-            // ONLY update the navbar user display (top-right corner)
-            // Be very specific to avoid changing notifications and other areas
+            // V15 Structure: Find the navbar user button
+            // In V15, the structure is: <li class="dropdown-navbar-user"> -> <button class="btn-reset nav-link">
+            var $userButton = $('.navbar .dropdown-navbar-user > .btn-reset.nav-link');
 
-            // Target 1: The main navbar user dropdown text
-            var $navbarUser = $('.navbar-right #toolbar-user').find('> a > .ellipsis, > a > span.user-name').first();
-            if ($navbarUser.length) {
-                console.log('[RF Whitelabel] Updating navbar user dropdown:', $navbarUser[0]);
-                $navbarUser.text(display_name);
+            if ($userButton.length === 0) {
+                console.log('[RF Whitelabel] User button not found with V15 selector, trying alternatives...');
+
+                // Alternative: look for any button in dropdown-navbar-user
+                $userButton = $('.navbar .dropdown-navbar-user button').first();
+
+                if ($userButton.length === 0) {
+                    console.log('[RF Whitelabel] ERROR: Could not find user button in navbar');
+                    console.log('[RF Whitelabel] Navbar HTML:', $('.navbar').html().substring(0, 500));
+                    return;
+                }
             }
 
-            // Target 2: Alternative selector for navbar user
-            var $navbarUserAlt = $('.navbar .dropdown-navbar-user > a').find('.ellipsis, .user-name').first();
-            if ($navbarUserAlt.length) {
-                console.log('[RF Whitelabel] Updating navbar user (alt):', $navbarUserAlt[0]);
-                $navbarUserAlt.text(display_name);
-            }
+            console.log('[RF Whitelabel] Found user button:', $userButton[0]);
+            console.log('[RF Whitelabel] Current button HTML:', $userButton.html().substring(0, 200));
 
-            // Target 3: User display next to avatar in top-right
-            var $avatarText = $('.navbar-right').find('.avatar').next('.ellipsis, .user-name').first();
-            if ($avatarText.length) {
-                console.log('[RF Whitelabel] Updating avatar text:', $avatarText[0]);
-                $avatarText.text(display_name);
-            }
+            // Check if button already has text, or just avatar
+            var hasAvatar = $userButton.find('.avatar, .avatar-frame').length > 0;
+            var currentText = $userButton.text().trim();
 
-            console.log('[RF Whitelabel] updateUserDisplay completed');
+            console.log('[RF Whitelabel] Has avatar:', hasAvatar, 'Current text:', currentText);
+
+            // Clear the button content and rebuild it with just the name
+            // Remove avatar to save space and show full name
+            $userButton.empty();
+            $userButton.html('<span class="user-name-display">' + display_name + '</span>');
+
+            console.log('[RF Whitelabel] Updated button HTML:', $userButton.html());
+            console.log('[RF Whitelabel] updateUserDisplay completed successfully');
         } catch (e) {
             console.error('[RF Whitelabel] Error in updateUserDisplay:', e);
+            console.error('[RF Whitelabel] Stack trace:', e.stack);
         }
     }
 
