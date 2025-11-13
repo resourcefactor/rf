@@ -127,12 +127,14 @@ console.log('[RF Whitelabel] ========================================');
             $userButton.empty();
 
             // Create span with inline styles to ensure they're applied
+            // Use the same green background that Frappe uses for avatars
             var $nameSpan = $('<span class="user-name-display"></span>')
                 .text(display_name)
                 .css({
                     'display': 'inline-block',
                     'padding': '8px 12px',
-                    'background': 'rgba(0, 0, 0, 0.1)',
+                    'background': 'var(--dark-green-avatar-bg)',
+                    'color': 'var(--dark-green-avatar-color)',
                     'border-radius': '4px',
                     'font-size': '14px',
                     'font-weight': '500',

@@ -17,9 +17,9 @@ li.dropdown.dropdown.dropdown-help.dropdown-mobile {
 .navbar .dropdown-navbar-user > .btn-reset.nav-link .user-name-display {
 	display: inline-block !important;
 	padding: 8px 12px !important;
-	background: rgba(0, 0, 0, 0.1) !important;
+	background: var(--dark-green-avatar-bg) !important;
+	color: var(--dark-green-avatar-color) !important;
 	border-radius: 4px !important;
-	color: inherit !important;
 	font-size: 14px !important;
 	font-weight: 500 !important;
 	white-space: nowrap !important;
