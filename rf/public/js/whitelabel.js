@@ -1,3 +1,25 @@
+// Override frappe.get_abbr to show full first name + last initial
+frappe.get_abbr = function(name, max_length) {
+    if (!name) return "";
+
+    var names = name.trim().split(/\s+/);
+    var abbr = "";
+
+    if (names.length > 1) {
+        // Full first name + Last name initial
+        abbr = names[0] + ' ' + names[names.length - 1].charAt(0).toUpperCase();
+    } else {
+        abbr = names[0];
+    }
+
+    // If max_length is specified and abbr is longer, truncate
+    if (max_length && abbr.length > max_length) {
+        abbr = abbr.substr(0, max_length);
+    }
+
+    return abbr;
+};
+
 $(window).on('load', function() {
     frappe.after_ajax(function () {
         if (frappe.boot.whitelabel_setting.show_help_menu) {
@@ -19,24 +41,52 @@ $(window).on('load', function() {
         // Update user display format: Full first name + Last name initial
         if (frappe.session.user && frappe.session.user !== 'Guest') {
             setTimeout(function() {
-                var full_name = frappe.boot.user.full_name || frappe.session.user;
-                var names = full_name.split(' ');
-                var display_name = '';
-
-                if (names.length > 1) {
-                    // Full first name + Last name initial
-                    display_name = names[0] + ' ' + names[names.length - 1].charAt(0);
-                } else {
-                    display_name = names[0];
+                updateUserDisplay();
+                // Use mutation observer to handle dynamic updates
+                var observer = new MutationObserver(function() {
+                    updateUserDisplay();
+                });
+                var navbarUserSection = document.querySelector('.navbar-right');
+                if (navbarUserSection) {
+                    observer.observe(navbarUserSection, { childList: true, subtree: true });
                 }
-
-                // Update the navbar user display
-                $('.navbar .navbar-user-section .user-info .user-name').text(display_name);
-
-                // For mobile/dropdown view
-                $('#toolbar-user .user-name-text').text(display_name);
-                $('#toolbar-user a[data-label="My Profile"]').closest('.dropdown-menu').find('.user-info .user-name').text(display_name);
             }, 500);
         }
     })
 })
+
+function updateUserDisplay() {
+    if (!frappe.session.user || frappe.session.user === 'Guest') return;
+
+    var full_name = frappe.boot.user.full_name || frappe.session.user;
+    var names = full_name.trim().split(/\s+/);
+    var display_name = '';
+
+    if (names.length > 1) {
+        // Full first name + Last name initial
+        display_name = names[0] + ' ' + names[names.length - 1].charAt(0).toUpperCase();
+    } else {
+        display_name = names[0];
+    }
+
+    // Update all possible user display locations
+    // Top right navbar - avatar with text
+    var $avatar = $('.avatar-frame, .avatar, [data-user], .user-image').parent().find('.avatar-name, .user-name, .ellipsis');
+    if ($avatar.length) {
+        $avatar.text(display_name);
+    }
+
+    // Navbar user text
+    $('.navbar .navbar-right .nav-link .user-name').text(display_name);
+
+    // Standard toolbar user
+    $('#toolbar-user').find('.ellipsis, .user-name').each(function() {
+        if ($(this).text().trim() && $(this).text().trim() !== display_name) {
+            $(this).text(display_name);
+        }
+    });
+
+    // Update user image title/alt attributes
+    $('[data-user="' + frappe.session.user + '"]').attr('title', display_name);
+    $('.user-image, .avatar-frame').attr('title', display_name);
+}

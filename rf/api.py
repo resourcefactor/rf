@@ -110,7 +110,16 @@ def rename_erpnext_workspaces():
 		try:
 			if frappe.db.exists("Workspace", old_name):
 				if not frappe.db.exists("Workspace", new_name):
+					# Rename the document
 					frappe.rename_doc("Workspace", old_name, new_name, force=True)
+					frappe.db.commit()
+
+			# Update the title field regardless (in case workspace exists with old title)
+			if frappe.db.exists("Workspace", new_name):
+				doc = frappe.get_doc("Workspace", new_name)
+				if doc.title != new_name:
+					doc.title = new_name
+					doc.save(ignore_permissions=True)
 					frappe.db.commit()
 		except Exception as e:
 			frappe.log_error(f"Workspace Rename Error: {old_name}", str(e))
