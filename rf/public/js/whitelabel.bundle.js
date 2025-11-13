@@ -125,7 +125,21 @@ console.log('[RF Whitelabel] ========================================');
             // Clear the button content and rebuild it with just the name
             // Remove avatar to save space and show full name
             $userButton.empty();
-            $userButton.html('<span class="user-name-display">' + display_name + '</span>');
+
+            // Create span with inline styles to ensure they're applied
+            var $nameSpan = $('<span class="user-name-display"></span>')
+                .text(display_name)
+                .css({
+                    'display': 'inline-block',
+                    'padding': '8px 12px',
+                    'background': 'rgba(0, 0, 0, 0.1)',
+                    'border-radius': '4px',
+                    'font-size': '14px',
+                    'font-weight': '500',
+                    'white-space': 'nowrap'
+                });
+
+            $userButton.append($nameSpan);
 
             console.log('[RF Whitelabel] Updated button HTML:', $userButton.html());
             console.log('[RF Whitelabel] updateUserDisplay completed successfully');
