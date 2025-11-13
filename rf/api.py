@@ -16,7 +16,6 @@ def whitelabel_patch():
 	update_onboard_details(brand_name)
 	update_website_settings(brand_name)
 	update_system_settings(brand_name)
-	rename_erpnext_workspaces()
 
 def boot_session(bootinfo):
 	"""boot session - send website info if guest"""
