@@ -3,4 +3,5 @@
 *.egg-info
 *.swp
 tags
-rf/docs/current
+node_modules
+__pycache__
