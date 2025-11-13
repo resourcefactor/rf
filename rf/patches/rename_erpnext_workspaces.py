@@ -16,7 +16,7 @@ def execute():
 				# Check if new workspace already exists
 				if not frappe.db.exists("Workspace", new_name):
 					# Rename the workspace
-					frappe.rename_doc("Workspace", old_name, new_name, force=True)
+					frappe.rename_doc("Workspace", old_name, new_name, force=True, merge=False)
 					frappe.db.commit()
 					print(f"Renamed workspace: {old_name} -> {new_name}")
 				else:
@@ -30,8 +30,33 @@ def execute():
 					doc.save(ignore_permissions=True)
 					frappe.db.commit()
 					print(f"Updated workspace title: {new_name}")
+
+			# Update workspace shortcuts pointing to old workspace
+			shortcuts = frappe.get_all("Workspace Shortcut",
+				filters={"link_to": old_name},
+				fields=["name", "parent"])
+			for shortcut in shortcuts:
+				frappe.db.set_value("Workspace Shortcut", shortcut.name, "link_to", new_name)
+				print(f"Updated shortcut in {shortcut.parent}")
+
+			# Update workspace links pointing to old workspace
+			links = frappe.get_all("Workspace Link",
+				filters={"link_to": old_name},
+				fields=["name", "parent"])
+			for link in links:
+				frappe.db.set_value("Workspace Link", link.name, "link_to", new_name)
+				print(f"Updated link in {link.parent}")
+
+			frappe.db.commit()
+
+			# Clear all caches to remove old workspace references
+			frappe.clear_cache()
+
+			if not frappe.db.exists("Workspace", old_name) and frappe.db.exists("Workspace", new_name):
+				print(f"Successfully renamed and configured: {old_name} -> {new_name}")
 			else:
 				print(f"Workspace {old_name} not found, skipping")
+
 		except Exception as e:
 			print(f"Error renaming workspace {old_name}: {str(e)}")
 			frappe.log_error(f"Workspace Rename Error: {old_name}", str(e))

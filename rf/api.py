@@ -111,8 +111,9 @@ def rename_erpnext_workspaces():
 			if frappe.db.exists("Workspace", old_name):
 				if not frappe.db.exists("Workspace", new_name):
 					# Rename the document
-					frappe.rename_doc("Workspace", old_name, new_name, force=True)
+					frappe.rename_doc("Workspace", old_name, new_name, force=True, merge=False)
 					frappe.db.commit()
+					print(f"Renamed workspace: {old_name} -> {new_name}")
 
 			# Update the title field regardless (in case workspace exists with old title)
 			if frappe.db.exists("Workspace", new_name):
@@ -121,5 +122,29 @@ def rename_erpnext_workspaces():
 					doc.title = new_name
 					doc.save(ignore_permissions=True)
 					frappe.db.commit()
+					print(f"Updated workspace title: {new_name}")
+
+			# Delete workspace shortcuts pointing to old workspace
+			shortcuts = frappe.get_all("Workspace Shortcut",
+				filters={"link_to": old_name},
+				fields=["name", "parent"])
+			for shortcut in shortcuts:
+				frappe.db.set_value("Workspace Shortcut", shortcut.name, "link_to", new_name)
+				print(f"Updated shortcut in {shortcut.parent}")
+
+			# Delete workspace links pointing to old workspace
+			links = frappe.get_all("Workspace Link",
+				filters={"link_to": old_name},
+				fields=["name", "parent"])
+			for link in links:
+				frappe.db.set_value("Workspace Link", link.name, "link_to", new_name)
+				print(f"Updated link in {link.parent}")
+
+			frappe.db.commit()
+
+			# Clear all caches to remove old workspace references
+			frappe.clear_cache()
+
 		except Exception as e:
+			print(f"Error renaming workspace {old_name}: {str(e)}")
 			frappe.log_error(f"Workspace Rename Error: {old_name}", str(e))
