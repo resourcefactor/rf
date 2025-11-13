@@ -16,6 +16,7 @@ def whitelabel_patch():
 	update_onboard_details(brand_name)
 	update_website_settings(brand_name)
 	update_system_settings(brand_name)
+	rename_erpnext_workspaces()
 
 def boot_session(bootinfo):
 	"""boot session - send website info if guest"""
@@ -97,3 +98,19 @@ def show_update_popup_update():
 	if update_message:
 		frappe.msgprint(update_message, title=_("New updates are available"), indicator='green')
 		cache.srem("update-user-set", user)
+
+def rename_erpnext_workspaces():
+	"""Rename ERPNext Workspaces to ERP Workspaces"""
+	workspace_renames = {
+		"ERPNext Integrations": "ERP Integrations",
+		"ERPNext Settings": "ERP Settings"
+	}
+
+	for old_name, new_name in workspace_renames.items():
+		try:
+			if frappe.db.exists("Workspace", old_name):
+				if not frappe.db.exists("Workspace", new_name):
+					frappe.rename_doc("Workspace", old_name, new_name, force=True)
+					frappe.db.commit()
+		except Exception as e:
+			frappe.log_error(f"Workspace Rename Error: {old_name}", str(e))
