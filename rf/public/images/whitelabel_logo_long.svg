@@ -1,0 +1,6 @@
+<svg width="150" height="32" viewBox="0 0 150 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Placeholder long logo for Resource Factors -->
+  <rect width="32" height="32" rx="4" fill="#0089FF"/>
+  <text x="16" y="16" text-anchor="middle" dominant-baseline="central" fill="white" font-family="Arial, sans-serif" font-size="18" font-weight="bold">RF</text>
+  <text x="45" y="20" fill="#333" font-family="Arial, sans-serif" font-size="16" font-weight="600">Resource Factors</text>
+</svg>

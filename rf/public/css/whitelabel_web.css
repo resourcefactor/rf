@@ -1,0 +1,7 @@
+/* Whitelabel CSS for Frappe v16 - Website */
+/* Copyright (c) 2025, Resource Factors */
+
+/* Hide "Powered by Frappe" footer on website */
+.footer-powered {
+	display: none !important;
+}

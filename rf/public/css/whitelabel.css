@@ -1,0 +1,43 @@
+/* Whitelabel CSS for Frappe v16 - Desk */
+/* Copyright (c) 2025, Resource Factors */
+
+/* Hide help menu dropdown by default */
+li.dropdown.dropdown-help.dropdown-mobile {
+	display: none !important;
+}
+
+/* v16: Updated selector for help dropdown */
+li.nav-item.dropdown.dropdown-help {
+	display: none !important;
+}
+
+/* User display styling - rectangular background */
+.navbar .dropdown-navbar-user > .btn-reset.nav-link {
+	background: transparent !important;
+	border: none !important;
+	padding: 4px 8px !important;
+}
+
+/* Hide avatar elements */
+.navbar .dropdown-navbar-user > .btn-reset.nav-link .avatar,
+.navbar .dropdown-navbar-user > .btn-reset.nav-link .avatar-frame {
+	display: none !important;
+}
+
+/* Style user name display */
+.navbar .dropdown-navbar-user > .btn-reset.nav-link .user-name-display {
+	display: inline-block !important;
+	padding: 8px 12px !important;
+	background: var(--dark-green-avatar-bg) !important;
+	color: var(--dark-green-avatar-color) !important;
+	border-radius: 4px !important;
+	font-size: 14px !important;
+	font-weight: 500 !important;
+	white-space: nowrap !important;
+}
+
+/* Custom navbar title styling */
+.custom-navbar-title {
+	margin-left: 1rem;
+	font-weight: 500;
+}

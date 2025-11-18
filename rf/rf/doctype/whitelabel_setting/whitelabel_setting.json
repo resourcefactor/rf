@@ -1,0 +1,171 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-11-18 13:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "general_settings_section",
+  "show_help_menu",
+  "disable_update_popup",
+  "hide_onboarding",
+  "column_break_general",
+  "whitelabel_app_name",
+  "brand_name",
+  "navbar_customization_section",
+  "use_custom_navbar_title",
+  "custom_navbar_title",
+  "custom_navbar_title_style",
+  "column_break_navbar",
+  "navbar_background_color",
+  "user_display_section",
+  "customize_user_display",
+  "user_display_format",
+  "email_settings_section",
+  "custom_email_footer",
+  "disable_standard_footer"
+ ],
+ "fields": [
+  {
+   "fieldname": "general_settings_section",
+   "fieldtype": "Section Break",
+   "label": "General Settings"
+  },
+  {
+   "default": "0",
+   "description": "Show the Help dropdown in navbar",
+   "fieldname": "show_help_menu",
+   "fieldtype": "Check",
+   "label": "Show Help Menu"
+  },
+  {
+   "default": "1",
+   "description": "Disable \"What's New\" update notification popups",
+   "fieldname": "disable_update_popup",
+   "fieldtype": "Check",
+   "label": "Disable Update Popup"
+  },
+  {
+   "default": "1",
+   "description": "Skip onboarding wizard for new users",
+   "fieldname": "hide_onboarding",
+   "fieldtype": "Check",
+   "label": "Hide Onboarding"
+  },
+  {
+   "fieldname": "column_break_general",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Replace 'ERPNext' branding with custom app name",
+   "fieldname": "whitelabel_app_name",
+   "fieldtype": "Data",
+   "label": "App Name"
+  },
+  {
+   "description": "Brand name for system settings",
+   "fieldname": "brand_name",
+   "fieldtype": "Data",
+   "label": "Brand Name"
+  },
+  {
+   "fieldname": "navbar_customization_section",
+   "fieldtype": "Section Break",
+   "label": "Navbar Customization"
+  },
+  {
+   "default": "0",
+   "fieldname": "use_custom_navbar_title",
+   "fieldtype": "Check",
+   "label": "Use Custom Navbar Title"
+  },
+  {
+   "depends_on": "use_custom_navbar_title",
+   "fieldname": "custom_navbar_title",
+   "fieldtype": "Data",
+   "label": "Custom Navbar Title"
+  },
+  {
+   "depends_on": "use_custom_navbar_title",
+   "description": "CSS styles for the custom navbar title",
+   "fieldname": "custom_navbar_title_style",
+   "fieldtype": "Code",
+   "label": "Custom Navbar Title Style",
+   "options": "CSS"
+  },
+  {
+   "fieldname": "column_break_navbar",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Navbar background color (hex code)",
+   "fieldname": "navbar_background_color",
+   "fieldtype": "Color",
+   "label": "Navbar Background Color"
+  },
+  {
+   "fieldname": "user_display_section",
+   "fieldtype": "Section Break",
+   "label": "User Display"
+  },
+  {
+   "default": "1",
+   "description": "Customize how user name is displayed in navbar",
+   "fieldname": "customize_user_display",
+   "fieldtype": "Check",
+   "label": "Customize User Display"
+  },
+  {
+   "default": "First + Last Initial",
+   "depends_on": "customize_user_display",
+   "fieldname": "user_display_format",
+   "fieldtype": "Select",
+   "label": "User Display Format",
+   "options": "Initials\nFirst + Last Initial\nFull Name"
+  },
+  {
+   "fieldname": "email_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Email Settings"
+  },
+  {
+   "description": "Custom footer for outgoing emails",
+   "fieldname": "custom_email_footer",
+   "fieldtype": "Text Editor",
+   "label": "Custom Email Footer"
+  },
+  {
+   "default": "0",
+   "description": "Disable standard Frappe email footer",
+   "fieldname": "disable_standard_footer",
+   "fieldtype": "Check",
+   "label": "Disable Standard Footer"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2025-11-18 13:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Rf",
+ "name": "Whitelabel Setting",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
