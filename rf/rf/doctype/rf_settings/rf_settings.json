@@ -1,0 +1,40 @@
+{
+    "actions": [],
+    "allow_rename": 1,
+    "creation": "2024-11-27 10:00:00.000000",
+    "doctype": "DocType",
+    "engine": "InnoDB",
+    "field_order": [
+        "hide_help_menu"
+    ],
+    "fields": [
+        {
+            "default": "0",
+            "fieldname": "hide_help_menu",
+            "fieldtype": "Check",
+            "label": "Hide Help Menu"
+        }
+    ],
+    "issingle": 1,
+    "links": [],
+    "modified": "2024-11-27 10:00:00.000000",
+    "modified_by": "Administrator",
+    "module": "Rf",
+    "name": "RF Settings",
+    "owner": "Administrator",
+    "permissions": [
+        {
+            "create": 1,
+            "delete": 1,
+            "email": 1,
+            "print": 1,
+            "read": 1,
+            "role": "System Manager",
+            "share": 1,
+            "write": 1
+        }
+    ],
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": []
+}
