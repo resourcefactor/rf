@@ -10,18 +10,18 @@ $(document).ready(function () {
         frappe.db.get_single_value('RF Settings', 'hide_help_menu')
             .then(hide => {
                 if (hide) {
-                    // Selectors for Help Menu
-                    const helpSelectors = [
-                        '.dropdown-help',
-                        '.navbar .nav-item[title="Help"]',
-                        '.navbar .nav-item[data-label="Help"]',
-                        '.navbar a[href*="help"]' // Fallback
-                    ];
+                    // Try to find the Help icon and hide its parent container
+                    // The icon usually has class 'icon-help' or similar SVG usage
+                    const $helpIcon = $('.navbar use[href*="help"]').closest('svg');
+                    if ($helpIcon.length) {
+                        $helpIcon.closest('.nav-item').hide();
+                        $helpIcon.closest('li').hide();
+                    }
 
-                    $(helpSelectors.join(',')).hide();
-
-                    // Also hide by finding the icon if needed
-                    $('.navbar .icon-help').closest('.nav-item').hide();
+                    // Fallback selectors
+                    $('.dropdown-help').hide();
+                    $('[title="Help"]').hide();
+                    $('[data-label="Help"]').hide();
                 }
             })
             .catch(err => {
@@ -33,7 +33,6 @@ $(document).ready(function () {
             const user_name = frappe.user.full_name;
 
             // Find the user dropdown by looking for the avatar in the navbar
-            // This is more robust than relying on a specific class like .dropdown-user which might have changed
             const $avatar = $('.navbar .avatar');
 
             if ($avatar.length) {
@@ -52,19 +51,23 @@ $(document).ready(function () {
         } catch (e) {
             console.error("RF App: Error setting full name", e);
         }
+
+        // 3. Change "ERPNext" to "ERP" in Sidebar Header
+        try {
+            $('.sidebar-header .sidebar-item-label.header-subtitle').text('ERP');
+        } catch (e) {
+            console.error("RF App: Error changing sidebar title", e);
+        }
     };
 
     // Run immediately
     run_customizations();
 
-    // Use MutationObserver to handle dynamic rendering (common in SPAs like ERPNext)
+    // Use MutationObserver to handle dynamic rendering
     const observer = new MutationObserver((mutations) => {
         run_customizations();
     });
 
-    // Start observing the navbar or body
-    const targetNode = document.querySelector('.navbar') || document.body;
-    if (targetNode) {
-        observer.observe(targetNode, { childList: true, subtree: true });
-    }
+    // Start observing the body for changes
+    observer.observe(document.body, { childList: true, subtree: true });
 });
