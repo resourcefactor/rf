@@ -61,6 +61,11 @@ console.log('[RF Whitelabel] Whitelabel script loaded');
 
             // Watch for dynamic content changes
             observeDOMChanges();
+
+            // Replace top-left ERPNext with delay to ensure navbar is loaded
+            setTimeout(function() {
+                replaceERPNextBranding();
+            }, 1500);
         });
     });
 
@@ -137,8 +142,28 @@ console.log('[RF Whitelabel] Whitelabel script loaded');
          * Only replaces display text, not IDs or data attributes
          */
         try {
+            // Replace in navbar top-left area
+            $('.navbar .navbar-home, .navbar-brand').each(function() {
+                var $this = $(this);
+                var text = $this.text();
+                if (text.includes('ERPNext')) {
+                    $this.text(text.replace(/ERPNext/g, 'ERP'));
+                    console.log('[RF Whitelabel] Replaced navbar text:', text, '->', $this.text());
+                }
+            });
+
+            // Replace in app selector/switcher
+            $('.app-selector, .app-name, .sidebar-label').each(function() {
+                var $this = $(this);
+                var text = $this.text();
+                if (text.includes('ERPNext')) {
+                    $this.text(text.replace(/ERPNext/g, 'ERP'));
+                    console.log('[RF Whitelabel] Replaced app selector:', text, '->', $this.text());
+                }
+            });
+
             // Replace in workspace sidebar titles
-            $('.sidebar-menu .workspace-link-title').each(function() {
+            $('.sidebar-menu .workspace-link-title, .sidebar-item-label, .workspace-label').each(function() {
                 var $this = $(this);
                 var text = $this.text();
                 if (text.includes('ERPNext')) {
@@ -148,7 +173,7 @@ console.log('[RF Whitelabel] Whitelabel script loaded');
             });
 
             // Replace in page titles
-            $('.page-title').each(function() {
+            $('.page-title, h1, h2').each(function() {
                 var $this = $(this);
                 var text = $this.text();
                 if (text.includes('ERPNext')) {
@@ -157,7 +182,7 @@ console.log('[RF Whitelabel] Whitelabel script loaded');
             });
 
             // Replace in breadcrumbs (but not URLs/routes)
-            $('.breadcrumb-item').each(function() {
+            $('.breadcrumb-item, #navbar-breadcrumbs li').each(function() {
                 var $this = $(this);
                 var $link = $this.find('a');
                 if ($link.length) {
@@ -170,6 +195,24 @@ console.log('[RF Whitelabel] Whitelabel script loaded');
                     var text = $this.text();
                     if (text.includes('ERPNext')) {
                         $this.text(text.replace(/ERPNext/g, 'ERP'));
+                    }
+                }
+            });
+
+            // Generic: Replace in any visible text that contains ERPNext
+            // This is a catch-all for any remaining instances
+            $('*').not('script, style, [data-route], [href], [src]').each(function() {
+                var $this = $(this);
+                // Only process text nodes, not child elements
+                var childNodes = this.childNodes;
+                for (var i = 0; i < childNodes.length; i++) {
+                    var node = childNodes[i];
+                    if (node.nodeType === 3) { // Text node
+                        var text = node.nodeValue;
+                        if (text && text.includes('ERPNext')) {
+                            node.nodeValue = text.replace(/ERPNext/g, 'ERP');
+                            console.log('[RF Whitelabel] Replaced text node:', text.trim(), '->', node.nodeValue.trim());
+                        }
                     }
                 }
             });
