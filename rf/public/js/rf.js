@@ -10,11 +10,18 @@ $(document).ready(function () {
         frappe.db.get_single_value('RF Settings', 'hide_help_menu')
             .then(hide => {
                 if (hide) {
-                    // Try multiple selectors for v16/v15 compatibility
-                    $('.dropdown-help').hide();
-                    $('.navbar .nav-item[title="Help"]').hide();
-                    $('.navbar .nav-item[data-label="Help"]').hide();
-                    // Also try hiding by icon if needed, but be careful
+                    // Selectors for Help Menu
+                    const helpSelectors = [
+                        '.dropdown-help',
+                        '.navbar .nav-item[title="Help"]',
+                        '.navbar .nav-item[data-label="Help"]',
+                        '.navbar a[href*="help"]' // Fallback
+                    ];
+
+                    $(helpSelectors.join(',')).hide();
+
+                    // Also hide by finding the icon if needed
+                    $('.navbar .icon-help').closest('.nav-item').hide();
                 }
             })
             .catch(err => {
@@ -24,15 +31,22 @@ $(document).ready(function () {
         // 2. Display Full Name instead of Initial
         try {
             const user_name = frappe.user.full_name;
-            const $user_dropdown_link = $('.navbar .dropdown-user .nav-link');
 
-            if ($user_dropdown_link.length) {
-                // Hide the avatar (which shows initials or image)
-                $user_dropdown_link.find('.avatar').hide();
+            // Find the user dropdown by looking for the avatar in the navbar
+            // This is more robust than relying on a specific class like .dropdown-user which might have changed
+            const $avatar = $('.navbar .avatar');
 
-                // Add full name if not already present
-                if ($user_dropdown_link.find('.rf-user-name').length === 0) {
-                    $user_dropdown_link.append(`<span class="rf-user-name" style="margin-left: 8px; font-weight: 500;">${user_name}</span>`);
+            if ($avatar.length) {
+                const $navLink = $avatar.closest('.nav-link');
+
+                if ($navLink.length) {
+                    // Hide the avatar
+                    $avatar.hide();
+
+                    // Add full name if not already present
+                    if ($navLink.find('.rf-user-name').length === 0) {
+                        $navLink.append(`<span class="rf-user-name" style="margin-left: 8px; font-weight: 500;">${user_name}</span>`);
+                    }
                 }
             }
         } catch (e) {
@@ -40,15 +54,17 @@ $(document).ready(function () {
         }
     };
 
-    // Run immediately if ready, or wait?
-    // In some versions, we might need to wait for 'app_ready' or similar.
-    // But usually $(document).ready is fine for DOM, but frappe.user might be populated later?
-    // frappe.user is populated from frappe.boot which is usually available in desk.
-
+    // Run immediately
     run_customizations();
 
-    // Also listen for route changes in case the navbar is re-rendered (unlikely for navbar, but good practice)
-    // $(document).on('page-change', function() {
-    //     run_customizations();
-    // });
+    // Use MutationObserver to handle dynamic rendering (common in SPAs like ERPNext)
+    const observer = new MutationObserver((mutations) => {
+        run_customizations();
+    });
+
+    // Start observing the navbar or body
+    const targetNode = document.querySelector('.navbar') || document.body;
+    if (targetNode) {
+        observer.observe(targetNode, { childList: true, subtree: true });
+    }
 });
