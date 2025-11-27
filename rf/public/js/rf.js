@@ -25,7 +25,7 @@ $(document).ready(function () {
                 }
             })
             .catch(err => {
-                console.warn("RF App: Could not fetch RF Settings", err);
+                // console.warn("RF App: Could not fetch RF Settings", err);
             });
 
         // 2. Display Full Name instead of Initial
@@ -54,7 +54,11 @@ $(document).ready(function () {
 
         // 3. Change "ERPNext" to "ERP" in Sidebar Header
         try {
-            $('.sidebar-header .sidebar-item-label.header-subtitle').text('ERP');
+            // Use a more specific selector and force it
+            const $sidebarTitle = $('.sidebar-header .sidebar-item-label.header-subtitle');
+            if ($sidebarTitle.length && $sidebarTitle.text().trim() !== 'ERP') {
+                $sidebarTitle.text('ERP');
+            }
         } catch (e) {
             console.error("RF App: Error changing sidebar title", e);
         }
@@ -64,10 +68,20 @@ $(document).ready(function () {
     run_customizations();
 
     // Use MutationObserver to handle dynamic rendering
+    // Debounce the observer to avoid performance issues and ensure DOM is settled
+    let timeout;
     const observer = new MutationObserver((mutations) => {
-        run_customizations();
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            run_customizations();
+        }, 100);
     });
 
     // Start observing the body for changes
     observer.observe(document.body, { childList: true, subtree: true });
+
+    // Also run on page change events if any
+    $(document).on('page-change', function () {
+        setTimeout(run_customizations, 200);
+    });
 });
