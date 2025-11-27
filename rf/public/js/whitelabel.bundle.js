@@ -1,10 +1,11 @@
 // Whitelabel JavaScript for Frappe v16
 // Copyright (c) 2025, Resource Factors
 
-console.log('[RF Whitelabel] Whitelabel script loaded');
-
 (function() {
     'use strict';
+
+    var isReplacing = false; // Flag to prevent recursive calls
+    var replaceTimeout = null;
 
     // Wait for frappe to be available
     function waitForFrappe(callback) {
@@ -16,16 +17,12 @@ console.log('[RF Whitelabel] Whitelabel script loaded');
     }
 
     waitForFrappe(function() {
-        console.log('[RF Whitelabel] Frappe object found, initializing...');
-
         // Set up when DOM is ready
         $(document).ready(function() {
-            console.log('[RF Whitelabel] DOM ready');
 
             // Apply whitelabel settings if available
             if (frappe.boot.whitelabel_setting) {
                 var settings = frappe.boot.whitelabel_setting;
-                console.log('[RF Whitelabel] Whitelabel settings loaded');
 
                 // Show help menu if configured
                 if (settings.show_help_menu) {
@@ -57,15 +54,13 @@ console.log('[RF Whitelabel] Whitelabel script loaded');
             }
 
             // Replace ERPNext branding with ERP in UI
-            replaceERPNextBranding();
+            setTimeout(replaceERPNextBranding, 100);
 
-            // Watch for dynamic content changes
+            // Replace again after delay for late-loading elements
+            setTimeout(replaceERPNextBranding, 1500);
+
+            // Watch for dynamic content changes (with debouncing)
             observeDOMChanges();
-
-            // Replace top-left ERPNext with delay to ensure navbar is loaded
-            setTimeout(function() {
-                replaceERPNextBranding();
-            }, 1500);
         });
     });
 
@@ -86,7 +81,6 @@ console.log('[RF Whitelabel] Whitelabel script loaded');
             var format = settings.user_display_format || "First + Last Initial";
 
             if (format === "Initials") {
-                // Just initials (default Frappe behavior)
                 return;
             } else if (format === "First + Last Initial") {
                 if (names.length > 1) {
@@ -98,18 +92,14 @@ console.log('[RF Whitelabel] Whitelabel script loaded');
                 display_name = full_name;
             }
 
-            console.log('[RF Whitelabel] Updating user display to:', display_name);
-
             // Find the navbar user button (v16 structure)
             var $userButton = $('.navbar .dropdown-navbar-user > .btn-reset.nav-link');
 
             if ($userButton.length === 0) {
-                // Fallback: try alternative selector
                 $userButton = $('.navbar .dropdown-navbar-user button').first();
             }
 
             if ($userButton.length === 0) {
-                console.log('[RF Whitelabel] Could not find user button');
                 return;
             }
 
@@ -130,7 +120,6 @@ console.log('[RF Whitelabel] Whitelabel script loaded');
                 });
 
             $userButton.append($nameSpan);
-            console.log('[RF Whitelabel] User display updated successfully');
         } catch (e) {
             console.error('[RF Whitelabel] Error updating user display:', e);
         }
@@ -139,16 +128,24 @@ console.log('[RF Whitelabel] Whitelabel script loaded');
     function replaceERPNextBranding() {
         /**
          * Replace "ERPNext" with "ERP" in visible UI elements
-         * Only replaces display text, not IDs or data attributes
+         * Optimized with flag to prevent recursive calls
          */
+        if (isReplacing) {
+            return; // Already running, skip
+        }
+
+        isReplacing = true;
+
         try {
+            var replaced = false;
+
             // Replace in navbar top-left area
             $('.navbar .navbar-home, .navbar-brand').each(function() {
                 var $this = $(this);
                 var text = $this.text();
                 if (text.includes('ERPNext')) {
                     $this.text(text.replace(/ERPNext/g, 'ERP'));
-                    console.log('[RF Whitelabel] Replaced navbar text:', text, '->', $this.text());
+                    replaced = true;
                 }
             });
 
@@ -158,7 +155,7 @@ console.log('[RF Whitelabel] Whitelabel script loaded');
                 var text = $this.text();
                 if (text.includes('ERPNext')) {
                     $this.text(text.replace(/ERPNext/g, 'ERP'));
-                    console.log('[RF Whitelabel] Replaced app selector:', text, '->', $this.text());
+                    replaced = true;
                 }
             });
 
@@ -168,7 +165,7 @@ console.log('[RF Whitelabel] Whitelabel script loaded');
                 var text = $this.text();
                 if (text.includes('ERPNext')) {
                     $this.text(text.replace(/ERPNext/g, 'ERP'));
-                    console.log('[RF Whitelabel] Replaced workspace title:', text, '->', $this.text());
+                    replaced = true;
                 }
             });
 
@@ -178,6 +175,7 @@ console.log('[RF Whitelabel] Whitelabel script loaded');
                 var text = $this.text();
                 if (text.includes('ERPNext')) {
                     $this.text(text.replace(/ERPNext/g, 'ERP'));
+                    replaced = true;
                 }
             });
 
@@ -186,24 +184,22 @@ console.log('[RF Whitelabel] Whitelabel script loaded');
                 var $this = $(this);
                 var $link = $this.find('a');
                 if ($link.length) {
-                    // Only replace the text, not the href
                     var text = $link.text();
                     if (text.includes('ERPNext')) {
                         $link.text(text.replace(/ERPNext/g, 'ERP'));
+                        replaced = true;
                     }
                 } else {
                     var text = $this.text();
                     if (text.includes('ERPNext')) {
                         $this.text(text.replace(/ERPNext/g, 'ERP'));
+                        replaced = true;
                     }
                 }
             });
 
             // Generic: Replace in any visible text that contains ERPNext
-            // This is a catch-all for any remaining instances
             $('*').not('script, style, [data-route], [href], [src]').each(function() {
-                var $this = $(this);
-                // Only process text nodes, not child elements
                 var childNodes = this.childNodes;
                 for (var i = 0; i < childNodes.length; i++) {
                     var node = childNodes[i];
@@ -211,40 +207,41 @@ console.log('[RF Whitelabel] Whitelabel script loaded');
                         var text = node.nodeValue;
                         if (text && text.includes('ERPNext')) {
                             node.nodeValue = text.replace(/ERPNext/g, 'ERP');
-                            console.log('[RF Whitelabel] Replaced text node:', text.trim(), '->', node.nodeValue.trim());
+                            replaced = true;
                         }
                     }
                 }
             });
-
-            console.log('[RF Whitelabel] ERPNext branding replacement completed');
         } catch (e) {
             console.error('[RF Whitelabel] Error replacing ERPNext branding:', e);
+        } finally {
+            isReplacing = false;
         }
     }
 
     function observeDOMChanges() {
         /**
-         * Watch for DOM changes and replace ERPNext branding in dynamically loaded content
+         * Watch for DOM changes with debouncing to prevent excessive calls
          */
         try {
             var observer = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
-                    if (mutation.addedNodes.length) {
-                        // Re-run branding replacement for newly added content
-                        setTimeout(replaceERPNextBranding, 100);
-                    }
-                });
+                // Debounce: only run once every 500ms
+                if (replaceTimeout) {
+                    clearTimeout(replaceTimeout);
+                }
+
+                replaceTimeout = setTimeout(function() {
+                    replaceERPNextBranding();
+                }, 500);
             });
 
-            // Observe the main container
-            var container = document.querySelector('body');
+            // Observe only the main content area, not the entire body
+            var container = document.querySelector('.main-section') || document.querySelector('body');
             if (container) {
                 observer.observe(container, {
                     childList: true,
                     subtree: true
                 });
-                console.log('[RF Whitelabel] DOM observer started');
             }
         } catch (e) {
             console.error('[RF Whitelabel] Error setting up DOM observer:', e);
