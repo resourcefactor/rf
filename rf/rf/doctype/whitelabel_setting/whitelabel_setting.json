@@ -14,68 +14,30 @@
   "disable_new_update_popup",
   "logo_settings_tab",
   "logo_setting_section",
-  "application_logo",
-  "app_logo_set",
-  "column_break_2",
-  "logo_height",
-  "logo_width",
+  "navbar_logo",
+  "navbar_logo_description",
+  "column_break_logo_1",
+  "login_page_logo",
+  "login_logo_description",
+  "section_break_logo_2",
+  "splash_page_logo",
+  "splash_logo_description",
+  "column_break_logo_3",
+  "favicon",
+  "favicon_description",
   "navbar_settings_tab",
   "navbar_setting_section",
   "navbar_background_color",
   "whitelabel_app_name",
   "column_break_7",
   "custom_navbar_title",
-  "custom_navbar_title_style",
-  "email_settings_tab",
-  "email_footer_section",
-  "email_footer_address",
-  "column_break_21",
-  "disable_standard_footer"
+  "custom_navbar_title_style"
  ],
  "fields": [
   {
-   "description": "In pixel",
-   "fieldname": "logo_height",
-   "fieldtype": "Data",
-   "label": "Logo Height"
-  },
-  {
-   "description": "In pixel",
-   "fieldname": "logo_width",
-   "fieldtype": "Data",
-   "label": "Logo Width"
-  },
-  {
-   "fieldname": "logo_setting_section",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "navbar_setting_section",
-   "fieldtype": "Section Break"
-  },
-  {
-   "description": "In Hex Code",
-   "fieldname": "navbar_background_color",
-   "fieldtype": "Data",
-   "label": "Navbar Background Color"
-  },
-  {
-   "fieldname": "column_break_2",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_7",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "custom_navbar_title",
-   "fieldtype": "Data",
-   "label": "Navbar Title"
-  },
-  {
-   "fieldname": "custom_navbar_title_style",
-   "fieldtype": "Code",
-   "label": "Navbar Title Style"
+   "fieldname": "general_settings_tab",
+   "fieldtype": "Tab Break",
+   "label": "General Settings"
   },
   {
    "fieldname": "whitelabel_setting_section",
@@ -109,47 +71,74 @@
    "label": "Disable System Update Notification"
   },
   {
-   "fieldname": "whitelabel_app_name",
-   "fieldtype": "Data",
-   "label": "Whitelabel App Name"
-  },
-  {
-   "description": "Upload the logo as public so it can accessible at login page ",
-   "fieldname": "application_logo",
-   "fieldtype": "Attach",
-   "label": "Application Logo"
-  },
-  {
-   "default": "0",
-   "fieldname": "app_logo_set",
-   "fieldtype": "Check",
-   "hidden": 1,
-   "label": "App Logo Set"
-  },
-  {
-   "fieldname": "email_footer_section",
-   "fieldtype": "Section Break",
-   "label": "Email Footer"
-  },
-  {
-   "fieldname": "email_footer_address",
-   "fieldtype": "Small Text",
-   "label": "Email Footer Address"
-  },
-  {
-   "fieldname": "column_break_21",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "0",
-   "fieldname": "disable_standard_footer",
-   "fieldtype": "Check",
-   "label": "Disable Standard Footer"
-  },
-  {
    "fieldname": "logo_settings_tab",
    "fieldtype": "Tab Break",
    "label": "Logo Settings"
+  },
+  {
+   "fieldname": "logo_setting_section",
+   "fieldtype": "Section Break",
+   "label": "Logo Configuration"
+  },
+  {
+   "fieldname": "navbar_logo",
+   "fieldtype": "Attach Image",
+   "label": "Navbar Logo",
+   "description": "Upload logo for navigation bar"
+  },
+  {
+   "fieldname": "navbar_logo_description",
+   "fieldtype": "HTML",
+   "label": "Navbar Logo Info",
+   "options": "<p style='color: #888; font-size: 12px;'><b>Best fit:</b> 200px × 30-40px | <b>Formats:</b> PNG, SVG (recommended), JPG</p>"
+  },
+  {
+   "fieldname": "column_break_logo_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "login_page_logo",
+   "fieldtype": "Attach Image",
+   "label": "Login Page Logo",
+   "description": "Upload logo for login page"
+  },
+  {
+   "fieldname": "login_logo_description",
+   "fieldtype": "HTML",
+   "label": "Login Logo Info",
+   "options": "<p style='color: #888; font-size: 12px;'><b>Best fit:</b> 400px × 100px | <b>Formats:</b> PNG, SVG (recommended), JPG</p>"
+  },
+  {
+   "fieldname": "section_break_logo_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "splash_page_logo",
+   "fieldtype": "Attach Image",
+   "label": "Splash Page Logo",
+   "description": "Upload logo for splash/loading screen"
+  },
+  {
+   "fieldname": "splash_logo_description",
+   "fieldtype": "HTML",
+   "label": "Splash Logo Info",
+   "options": "<p style='color: #888; font-size: 12px;'><b>Best fit:</b> 512px × 512px (square) | <b>Formats:</b> PNG, SVG (recommended)</p>"
+  },
+  {
+   "fieldname": "column_break_logo_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "favicon",
+   "fieldtype": "Attach Image",
+   "label": "Favicon",
+   "description": "Upload favicon for browser tab"
+  },
+  {
+   "fieldname": "favicon_description",
+   "fieldtype": "HTML",
+   "label": "Favicon Info",
+   "options": "<p style='color: #888; font-size: 12px;'><b>Best fit:</b> 32×32px or 192×192px | <b>Formats:</b> ICO, PNG</p>"
   },
   {
    "fieldname": "navbar_settings_tab",
@@ -157,14 +146,33 @@
    "label": "Navbar Settings"
   },
   {
-   "fieldname": "email_settings_tab",
-   "fieldtype": "Tab Break",
-   "label": "Email Settings"
+   "fieldname": "navbar_setting_section",
+   "fieldtype": "Section Break"
   },
   {
-   "fieldname": "general_settings_tab",
-   "fieldtype": "Tab Break",
-   "label": "General Settings"
+   "description": "In Hex Code",
+   "fieldname": "navbar_background_color",
+   "fieldtype": "Data",
+   "label": "Navbar Background Color"
+  },
+  {
+   "fieldname": "whitelabel_app_name",
+   "fieldtype": "Data",
+   "label": "Whitelabel App Name"
+  },
+  {
+   "fieldname": "column_break_7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "custom_navbar_title",
+   "fieldtype": "Data",
+   "label": "Navbar Title"
+  },
+  {
+   "fieldname": "custom_navbar_title_style",
+   "fieldtype": "Code",
+   "label": "Navbar Title Style"
   }
  ],
  "issingle": 1,
