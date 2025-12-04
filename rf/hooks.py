@@ -25,11 +25,11 @@ app_license = "mit"
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = "/assets/rf/css/rf.css"
-# app_include_js = "/assets/rf/js/rf.js"
+app_include_css = "/assets/rf/css/whitelabel_app.css"
+app_include_js = "whitelabel.bundle.js"
 
 # include js, css files in header of web template
-# web_include_css = "/assets/rf/css/rf.css"
+web_include_css = "/assets/rf/css/whitelabel_web.css"
 # web_include_js = "/assets/rf/js/rf.js"
 
 # include custom scss in every website theme (without file extension ".scss")
@@ -64,6 +64,13 @@ app_license = "mit"
 # 	"Role": "home_page"
 # }
 
+# Website Context
+# ---------------
+website_context = {
+	"favicon": "/assets/rf/images/whitelabel_logo.svg",
+	"splash_image": "/assets/rf/images/whitelabel_logo.svg"
+}
+
 # Generators
 # ----------
 
@@ -84,6 +91,14 @@ app_license = "mit"
 
 # before_install = "rf.install.before_install"
 # after_install = "rf.install.after_install"
+
+# After Migrate
+# -------------
+after_migrate = ['rf.api.whitelabel_patch']
+
+# Boot Session
+# ------------
+boot_session = "rf.api.boot_session"
 
 # Uninstallation
 # ------------
@@ -174,9 +189,9 @@ app_license = "mit"
 # Overriding Methods
 # ------------------------------
 #
-# override_whitelisted_methods = {
-# 	"frappe.desk.doctype.event.event.get_events": "rf.event.get_events"
-# }
+override_whitelisted_methods = {
+	"frappe.utils.change_log.show_update_popup": "rf.api.ignore_update_popup"
+}
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
@@ -242,3 +257,16 @@ app_license = "mit"
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+# Fixtures
+# --------
+fixtures = [
+    {"dt": "Custom Field", "filters": [["Translation","source_text","like","%ERPNext%"]]}
+]
+
+# Brand Settings
+# --------------
+brand_html = (
+    '<div><img  src="/assets/rf/images/whitelabel_logo_long.svg"> </div>'
+)
+
+brand_name = "Resource Factors"
