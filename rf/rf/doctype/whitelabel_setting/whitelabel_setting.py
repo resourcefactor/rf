@@ -33,17 +33,20 @@ class WhitelabelSetting(Document):
 		# Set Navbar Logo - use navbar_logo if set, otherwise use login_page_logo as fallback
 		navbar_logo_to_use = self.navbar_logo or self.login_page_logo or ""
 		if navbar_logo_to_use:
+			# Set in both navbar settings and website settings (navbar may use either)
 			navbar_settings_doc.app_logo = navbar_logo_to_use
+			website_doc.app_logo = navbar_logo_to_use  # Navbar fallback
 			update_site_config("app_logo_url", navbar_logo_to_use)
 			frappe.logger().info(f"[Whitelabel] Set navbar logo to: {navbar_logo_to_use}")
 		else:
 			navbar_settings_doc.app_logo = ""
+			website_doc.app_logo = ""
 			update_site_config("app_logo_url", False)
 			frappe.logger().info("[Whitelabel] Cleared navbar logo")
 
-		# Set Login Page Logo - store in custom field or use login_logo_url
+		# Set Login Page Logo - store in site config for login page override
 		if self.login_page_logo:
-			# Store login page logo URL in site config for custom login page template
+			# Store login page logo URL in site config for context override
 			update_site_config("login_logo_url", self.login_page_logo)
 			frappe.logger().info(f"[Whitelabel] Set login logo to: {self.login_page_logo}")
 		else:
