@@ -2,26 +2,43 @@
 	display: none!important;
 }
 
-/* Login Page Logo Styling */
-.login-content .login-icon-svg {
-	max-width: 400px !important;
-	max-height: 150px !important;
-	width: auto !important;
-	height: auto !important;
-}
-
-.login-content .app-logo {
-	max-width: 400px !important;
-	max-height: 150px !important;
-	width: auto !important;
-	height: auto !important;
-}
-
+/* Login Page Logo Styling - ERPNext v15 */
+/* Target all possible login logo containers */
+.login-content .login-icon-svg,
+.login-content .app-logo,
+.page-card .app-logo,
 .page-card .app-logo img,
-.login-content img.app-logo {
+.login-content img.app-logo,
+.login-content img,
+.page-card img,
+.for-login .app-logo,
+.for-login img {
 	max-width: 400px !important;
 	max-height: 150px !important;
+	min-width: 200px !important;
+	min-height: 60px !important;
 	width: auto !important;
 	height: auto !important;
 	object-fit: contain !important;
+}
+
+/* Ensure login page container doesn't constrain logo */
+.login-content,
+.page-card,
+.for-login {
+	text-align: center !important;
+}
+
+/* Override any default small sizing */
+.page-card .app-logo {
+	padding: 20px 0 !important;
+}
+
+/* Force logo dimensions on login page specifically */
+body[data-path="login"] .app-logo img,
+body[data-route="login"] .app-logo img {
+	max-width: 400px !important;
+	max-height: 150px !important;
+	width: auto !important;
+	height: auto !important;
 }

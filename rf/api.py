@@ -23,15 +23,18 @@ def boot_session(bootinfo):
 		bootinfo.whitelabel_setting = frappe.get_doc("Whitelabel Setting","Whitelabel Setting")
 
 def get_website_context(context):
-	"""Override website context for login and other pages"""
+	"""Override website context for login and other public pages"""
+	# Only apply custom logo for Guest users (login page, signup, etc.)
+	if frappe.session.user != "Guest":
+		return context
+
 	# Get the login logo URL from site config
 	login_logo_url = frappe.conf.get("login_logo_url")
 
 	if login_logo_url:
-		# If we're on the login page or a public page, use the login logo
-		if frappe.session.user == "Guest" or context.get("pathname") == "/login":
-			context["app_logo_url"] = login_logo_url
-			frappe.logger().info(f"[Whitelabel] Setting login page logo: {login_logo_url}")
+		# Override app_logo_url for public pages
+		context["app_logo_url"] = login_logo_url
+		frappe.logger().info(f"[Whitelabel] Setting public page logo: {login_logo_url}")
 
 	return context
 
