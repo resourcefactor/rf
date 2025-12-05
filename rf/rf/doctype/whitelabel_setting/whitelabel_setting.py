@@ -30,23 +30,28 @@ class WhitelabelSetting(Document):
 				system_settings_doc.app_name = "Frappe"
 
 	def set_logo_settings(self, navbar_settings_doc, website_doc):
-		# Set Navbar Logo - used by logged-in users
+		# Set Navbar Logo - used for navbar on all pages (login and after login)
 		if self.navbar_logo:
 			navbar_settings_doc.app_logo = self.navbar_logo
-			website_doc.app_logo = self.navbar_logo
 			update_site_config("app_logo_url", self.navbar_logo)
 			frappe.logger().info(f"[Whitelabel] Set navbar logo to: {self.navbar_logo}")
 		else:
 			navbar_settings_doc.app_logo = ""
-			website_doc.app_logo = ""
 			update_site_config("app_logo_url", False)
 			frappe.logger().info("[Whitelabel] Cleared navbar logo")
 
-		# Set Login Page Logo - stored separately, used by get_website_context for Guest users
+		# Set Login Page Main Logo - used for the main logo on login page
 		if self.login_page_logo:
+			website_doc.app_logo = self.login_page_logo
 			update_site_config("login_logo_url", self.login_page_logo)
 			frappe.logger().info(f"[Whitelabel] Set login page logo to: {self.login_page_logo}")
+		elif self.navbar_logo:
+			# Fallback to navbar logo if login_page_logo is not set
+			website_doc.app_logo = self.navbar_logo
+			update_site_config("login_logo_url", self.navbar_logo)
+			frappe.logger().info(f"[Whitelabel] Login page logo not set, using navbar logo: {self.navbar_logo}")
 		else:
+			website_doc.app_logo = ""
 			update_site_config("login_logo_url", False)
 			frappe.logger().info("[Whitelabel] Cleared login page logo")
 
