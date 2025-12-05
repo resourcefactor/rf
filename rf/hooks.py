@@ -71,6 +71,9 @@ website_context = {
 	"splash_image": "/assets/rf/images/whitelabel_logo.svg"
 }
 
+# Update website context dynamically for login page
+update_website_context = "rf.api.get_website_context"
+
 # Generators
 # ----------
 

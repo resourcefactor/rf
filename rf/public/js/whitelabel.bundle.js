@@ -33,22 +33,27 @@ console.log('[RF Whitelabel] ========================================');
 
             if (frappe.boot.whitelabel_setting) {
                 console.log('[RF Whitelabel] Whitelabel settings found');
+                console.log('[RF Whitelabel] Settings:', frappe.boot.whitelabel_setting);
 
                 if (frappe.boot.whitelabel_setting.show_help_menu) {
                     $('.dropdown-help').attr('style', 'display: block !important');
                 }
-                if (frappe.boot.whitelabel_setting.logo_width) {
-                    $('.app-logo').css('width',frappe.boot.whitelabel_setting.logo_width+'px');
-                }
-                if (frappe.boot.whitelabel_setting.logo_height) {
-                    $('.app-logo').css('height',frappe.boot.whitelabel_setting.logo_height+'px');
-                }
+
+                // Apply navbar background color
                 if (frappe.boot.whitelabel_setting.navbar_background_color) {
                     $('.navbar').css('background-color',frappe.boot.whitelabel_setting.navbar_background_color)
                 }
+
+                // Apply custom navbar title
                 if (frappe.boot.whitelabel_setting.custom_navbar_title_style && frappe.boot.whitelabel_setting.custom_navbar_title) {
                     $(`<span style=${frappe.boot.whitelabel_setting.custom_navbar_title_style.replace('\n','')} class="hidden-xs hidden-sm">${frappe.boot.whitelabel_setting.custom_navbar_title}</span>`).insertAfter("#navbar-breadcrumbs")
                 }
+
+                // Log logo URLs for debugging
+                console.log('[RF Whitelabel] Navbar logo:', frappe.boot.whitelabel_setting.navbar_logo);
+                console.log('[RF Whitelabel] Login logo:', frappe.boot.whitelabel_setting.login_page_logo);
+                console.log('[RF Whitelabel] Splash logo:', frappe.boot.whitelabel_setting.splash_page_logo);
+                console.log('[RF Whitelabel] Favicon:', frappe.boot.whitelabel_setting.favicon);
             } else {
                 console.log('[RF Whitelabel] WARNING: Whitelabel settings not found in boot');
             }

@@ -22,6 +22,19 @@ def boot_session(bootinfo):
 	if frappe.session['user']!='Guest':
 		bootinfo.whitelabel_setting = frappe.get_doc("Whitelabel Setting","Whitelabel Setting")
 
+def get_website_context(context):
+	"""Override website context for login and other pages"""
+	# Get the login logo URL from site config
+	login_logo_url = frappe.conf.get("login_logo_url")
+
+	if login_logo_url:
+		# If we're on the login page or a public page, use the login logo
+		if frappe.session.user == "Guest" or context.get("pathname") == "/login":
+			context["app_logo_url"] = login_logo_url
+			frappe.logger().info(f"[Whitelabel] Setting login page logo: {login_logo_url}")
+
+	return context
+
 @frappe.whitelist()
 def ignore_update_popup():
 	if not frappe.db.get_single_value('Whitelabel Setting', 'disable_new_update_popup'):

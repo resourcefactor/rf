@@ -1,3 +1,27 @@
 .footer-powered{
 	display: none!important;
 }
+
+/* Login Page Logo Styling */
+.login-content .login-icon-svg {
+	max-width: 400px !important;
+	max-height: 150px !important;
+	width: auto !important;
+	height: auto !important;
+}
+
+.login-content .app-logo {
+	max-width: 400px !important;
+	max-height: 150px !important;
+	width: auto !important;
+	height: auto !important;
+}
+
+.page-card .app-logo img,
+.login-content img.app-logo {
+	max-width: 400px !important;
+	max-height: 150px !important;
+	width: auto !important;
+	height: auto !important;
+	object-fit: contain !important;
+}

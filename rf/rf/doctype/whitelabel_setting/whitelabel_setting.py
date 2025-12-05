@@ -30,33 +30,43 @@ class WhitelabelSetting(Document):
 				system_settings_doc.app_name = "Frappe"
 
 	def set_logo_settings(self, navbar_settings_doc, website_doc):
-		# Set Navbar Logo
-		if self.navbar_logo:
-			navbar_settings_doc.app_logo = self.navbar_logo
-			update_site_config("app_logo_url", self.navbar_logo)
+		# Set Navbar Logo - use navbar_logo if set, otherwise use login_page_logo as fallback
+		navbar_logo_to_use = self.navbar_logo or self.login_page_logo or ""
+		if navbar_logo_to_use:
+			navbar_settings_doc.app_logo = navbar_logo_to_use
+			update_site_config("app_logo_url", navbar_logo_to_use)
+			frappe.logger().info(f"[Whitelabel] Set navbar logo to: {navbar_logo_to_use}")
 		else:
 			navbar_settings_doc.app_logo = ""
 			update_site_config("app_logo_url", False)
+			frappe.logger().info("[Whitelabel] Cleared navbar logo")
 
-		# Set Login Page Logo
+		# Set Login Page Logo - store in custom field or use login_logo_url
 		if self.login_page_logo:
-			website_doc.app_logo = self.login_page_logo
+			# Store login page logo URL in site config for custom login page template
+			update_site_config("login_logo_url", self.login_page_logo)
+			frappe.logger().info(f"[Whitelabel] Set login logo to: {self.login_page_logo}")
 		else:
-			website_doc.app_logo = ""
+			update_site_config("login_logo_url", False)
+			frappe.logger().info("[Whitelabel] Cleared login logo")
 
 		# Set Splash Page Logo
 		if self.splash_page_logo:
 			website_doc.splash_image = self.splash_page_logo
+			frappe.logger().info(f"[Whitelabel] Set splash logo to: {self.splash_page_logo}")
 		else:
 			website_doc.splash_image = ""
+			frappe.logger().info("[Whitelabel] Cleared splash logo")
 
 		# Set Favicon
 		if self.favicon:
 			website_doc.favicon = self.favicon
 			update_site_config("favicon", self.favicon)
+			frappe.logger().info(f"[Whitelabel] Set favicon to: {self.favicon}")
 		else:
 			website_doc.favicon = ""
 			update_site_config("favicon", False)
+			frappe.logger().info("[Whitelabel] Cleared favicon")
 
 		frappe.clear_cache()
 
