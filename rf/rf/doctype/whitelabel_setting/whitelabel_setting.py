@@ -33,25 +33,23 @@ class WhitelabelSetting(Document):
 		# Set Navbar Logo - used for navbar on all pages (login and after login)
 		if self.navbar_logo:
 			navbar_settings_doc.app_logo = self.navbar_logo
+			website_doc.app_logo = self.navbar_logo
 			update_site_config("app_logo_url", self.navbar_logo)
 			frappe.logger().info(f"[Whitelabel] Set navbar logo to: {self.navbar_logo}")
 		else:
 			navbar_settings_doc.app_logo = ""
+			website_doc.app_logo = ""
 			update_site_config("app_logo_url", False)
 			frappe.logger().info("[Whitelabel] Cleared navbar logo")
 
-		# Set Login Page Main Logo - used for the main logo on login page
+		# Set Login Page Logo - only affects Guest users via get_website_context hook
+		# This should NOT set website_doc.app_logo (that's controlled by navbar_logo above)
 		if self.login_page_logo:
-			# User explicitly set a login page logo - use it
-			website_doc.app_logo = self.login_page_logo
 			update_site_config("login_logo_url", self.login_page_logo)
 			frappe.logger().info(f"[Whitelabel] Set login page logo to: {self.login_page_logo}")
 		else:
-			# No login page logo set - use navbar logo for website_doc but don't override login_logo_url
-			# This allows login page to show navbar logo by default without blocking future customization
-			website_doc.app_logo = self.navbar_logo if self.navbar_logo else ""
 			update_site_config("login_logo_url", False)
-			frappe.logger().info("[Whitelabel] No login page logo set, cleared login_logo_url")
+			frappe.logger().info("[Whitelabel] Cleared login page logo")
 
 		# Set Splash Page Logo
 		if self.splash_page_logo:
