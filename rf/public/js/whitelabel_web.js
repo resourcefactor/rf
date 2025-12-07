@@ -21,10 +21,35 @@ console.log('[RF Whitelabel Web] Initializing login page customization');
 
         if (isLoginPage) {
             console.log('[RF Whitelabel Web] Login page detected, applying logo fixes');
-            fixLoginLogo();
+
+            // Fetch login logo URL from API and replace logo
+            fetch('/api/method/rf.api.get_login_logo_url', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Frappe-CSRF-Token': frappe?.csrf_token || ''
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.message && data.message.login_logo_url) {
+                    console.log('[RF Whitelabel Web] Login logo URL from API:', data.message.login_logo_url);
+                    replaceLoginLogo(data.message.login_logo_url);
+                } else {
+                    console.log('[RF Whitelabel Web] No login logo URL configured, using default');
+                    fixLoginLogoStyles();
+                }
+            })
+            .catch(error => {
+                console.error('[RF Whitelabel Web] Error fetching login logo URL:', error);
+                fixLoginLogoStyles();
+            });
 
             // Watch for logo changes (in case Frappe updates it dynamically)
-            const observer = new MutationObserver(fixLoginLogo);
+            const observer = new MutationObserver(() => {
+                // Re-fetch and replace logo when DOM changes
+                init();
+            });
             const targetNode = document.querySelector('.page-card') || document.body;
             observer.observe(targetNode, { childList: true, subtree: true });
         } else {
@@ -32,41 +57,61 @@ console.log('[RF Whitelabel Web] Initializing login page customization');
         }
     }
 
-    function fixLoginLogo() {
-        // Find all logo images on the page
+    function replaceLoginLogo(loginLogoUrl) {
+        // Find the main login page logo (exclude navbar logos)
         const logoSelectors = [
-            '.app-logo img',
-            '.login-content img',
-            '.page-card img',
-            'img.app-logo',
-            '.login-icon-svg'
+            '.login-content img.app-logo',
+            '.page-card-body img.app-logo',
+            '.login-content .app-logo img',
+            '.page-card img.app-logo'
         ];
 
-        let logoFound = false;
+        let logoReplaced = false;
 
         logoSelectors.forEach(selector => {
             const logos = document.querySelectorAll(selector);
             logos.forEach(logo => {
-                if (logo && logo.src) {
-                    logoFound = true;
-                    console.log('[RF Whitelabel Web] Found logo:', logo.src);
+                // Make sure it's not a navbar logo
+                if (logo && logo.src && !logo.closest('.navbar')) {
+                    console.log('[RF Whitelabel Web] Replacing login logo:', logo.src, '->', loginLogoUrl);
+                    logo.src = loginLogoUrl;
 
-                    // Apply sizing styles directly
+                    // Apply sizing styles
                     logo.style.maxWidth = '400px';
                     logo.style.maxHeight = '150px';
-                    logo.style.minWidth = '200px';
-                    logo.style.minHeight = '60px';
                     logo.style.width = 'auto';
                     logo.style.height = 'auto';
                     logo.style.objectFit = 'contain';
 
-                    console.log('[RF Whitelabel Web] Applied size styles to logo');
+                    logoReplaced = true;
                 }
             });
         });
 
-        if (!logoFound) {
-            console.log('[RF Whitelabel Web] No logo found on page yet');
+        if (!logoReplaced) {
+            console.log('[RF Whitelabel Web] No login logo found to replace');
         }
+    }
+
+    function fixLoginLogoStyles() {
+        // Just apply styles without changing src
+        const logoSelectors = [
+            '.login-content img.app-logo',
+            '.page-card-body img.app-logo',
+            '.login-content .app-logo img'
+        ];
+
+        logoSelectors.forEach(selector => {
+            const logos = document.querySelectorAll(selector);
+            logos.forEach(logo => {
+                if (logo && logo.src && !logo.closest('.navbar')) {
+                    logo.style.maxWidth = '400px';
+                    logo.style.maxHeight = '150px';
+                    logo.style.width = 'auto';
+                    logo.style.height = 'auto';
+                    logo.style.objectFit = 'contain';
+                }
+            });
+        });
     }
 })();

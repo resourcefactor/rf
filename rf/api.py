@@ -38,6 +38,14 @@ def get_website_context(context):
 
 	return context
 
+@frappe.whitelist(allow_guest=True)
+def get_login_logo_url():
+	"""Return the login logo URL from site config"""
+	login_logo_url = frappe.conf.get("login_logo_url")
+	return {
+		"login_logo_url": login_logo_url if login_logo_url else None
+	}
+
 @frappe.whitelist()
 def ignore_update_popup():
 	if not frappe.db.get_single_value('Whitelabel Setting', 'disable_new_update_popup'):
