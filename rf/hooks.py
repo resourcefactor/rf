@@ -30,7 +30,7 @@ app_include_js = "whitelabel.bundle.js"
 
 # include js, css files in header of web template
 web_include_css = "/assets/rf/css/whitelabel_web.css"
-web_include_js = "/assets/rf/js/whitelabel_web.js"
+web_include_js = ["/assets/rf/js/whitelabel_web.js?v=2"]
 
 # include custom scss in every website theme (without file extension ".scss")
 # website_theme_scss = "rf/public/scss/website"
