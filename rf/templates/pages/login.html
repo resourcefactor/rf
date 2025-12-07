@@ -7,16 +7,16 @@
 	</div>
 	<div class="login-content page-card-body">
 		<!-- Custom Login Logo -->
-		{% if frappe.get_site_config().get("login_logo_url") %}
+		{% if login_logo_url %}
 		<div style="text-align: center; margin-bottom: 2rem;">
-			<img src="{{ frappe.get_site_config().get('login_logo_url') }}"
+			<img src="{{ login_logo_url }}"
 			     class="custom-login-logo"
 			     alt="Login Logo"
 			     style="max-width: 400px; max-height: 150px; width: auto; height: auto; object-fit: contain;">
 		</div>
-		{% elif frappe.boot.app_logo_url %}
+		{% elif app_logo_url %}
 		<div style="text-align: center; margin-bottom: 2rem;">
-			<img src="{{ frappe.boot.app_logo_url }}"
+			<img src="{{ app_logo_url }}"
 			     class="app-logo"
 			     alt="App Logo"
 			     style="max-width: 400px; max-height: 150px; width: auto; height: auto; object-fit: contain;">
