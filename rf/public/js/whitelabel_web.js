@@ -59,11 +59,13 @@ console.log('[RF Whitelabel Web] Initializing login page customization');
 
     function replaceLoginLogo(loginLogoUrl) {
         // Find the main login page logo (exclude navbar logos)
+        // Try multiple selectors to catch different HTML structures
         const logoSelectors = [
-            '.login-content img.app-logo',
-            '.page-card-body img.app-logo',
-            '.login-content .app-logo img',
-            '.page-card img.app-logo'
+            'img.app-logo',  // Direct img with app-logo class
+            '.app-logo img', // img inside app-logo container
+            '.login-content img',
+            '.page-card-body img',
+            '.page-card img'
         ];
 
         let logoReplaced = false;
@@ -71,8 +73,8 @@ console.log('[RF Whitelabel Web] Initializing login page customization');
         logoSelectors.forEach(selector => {
             const logos = document.querySelectorAll(selector);
             logos.forEach(logo => {
-                // Make sure it's not a navbar logo
-                if (logo && logo.src && !logo.closest('.navbar')) {
+                // Make sure it's not a navbar logo and has a src attribute
+                if (logo && logo.src && !logo.closest('.navbar') && !logo.closest('nav')) {
                     console.log('[RF Whitelabel Web] Replacing login logo:', logo.src, '->', loginLogoUrl);
                     logo.src = loginLogoUrl;
 
@@ -84,12 +86,14 @@ console.log('[RF Whitelabel Web] Initializing login page customization');
                     logo.style.objectFit = 'contain';
 
                     logoReplaced = true;
+                    console.log('[RF Whitelabel Web] Logo replaced successfully');
                 }
             });
         });
 
         if (!logoReplaced) {
             console.log('[RF Whitelabel Web] No login logo found to replace');
+            console.log('[RF Whitelabel Web] Available images on page:', document.querySelectorAll('img'));
         }
     }
 
