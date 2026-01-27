@@ -67,8 +67,8 @@ web_include_js = ["/assets/rf/js/whitelabel_web.js?v=3"]
 # Website Context
 # ---------------
 website_context = {
-	"favicon": "/assets/rf/images/whitelabel_logo.svg",
-	"splash_image": "/assets/rf/images/whitelabel_logo.svg"
+	"favicon": "/assets/rf/images/rf_ico.ico",
+	"splash_image": "/assets/rf/images/rf_svg.svg"
 }
 
 # Update website context dynamically for login page
@@ -269,7 +269,7 @@ fixtures = [
 # Brand Settings
 # --------------
 brand_html = (
-    '<div><img  src="/assets/rf/images/whitelabel_logo_long.svg"> </div>'
+    '<div><img  src="/assets/rf/images/rf_svg.svg"> </div>'
 )
 
 brand_name = "Resource Factors"
