@@ -56,15 +56,25 @@
                 return;
             }
 
-            var full_name = frappe.boot.user.full_name || frappe.session.user;
-            var names = full_name.trim().split(/\s+/);
+            var full_name = frappe.boot.user.full_name
+                || (frappe.boot.user.first_name && (frappe.boot.user.first_name + (frappe.boot.user.last_name ? ' ' + frappe.boot.user.last_name : '')))
+                || frappe.boot.user.first_name
+                || '';
             var display_name = '';
 
-            if (names.length > 1) {
-                // Full first name + Last name initial
-                display_name = names[0] + ' ' + names[names.length - 1].charAt(0).toUpperCase();
-            } else {
-                display_name = names[0];
+            if (full_name) {
+                var names = full_name.trim().split(/\s+/);
+                if (names.length > 1) {
+                    // Full first name + Last name initial
+                    display_name = names[0] + ' ' + names[names.length - 1].charAt(0).toUpperCase();
+                } else {
+                    display_name = names[0];
+                }
+            }
+
+            // If still empty, do not update — leave Frappe's default rendering
+            if (!display_name) {
+                return;
             }
 
             // V15 Structure: Find the navbar user button
