@@ -1,123 +1,110 @@
 """
 Patch: Fix frappe-datatable index column width for large row counts (1000+)
 
-The _rowIndex column in frappe-datatable uses measureTextWidth() to calculate
-its width, but this can return inaccurate values. This patch adds a minimum
-width based on digit count so the column is never too narrow.
+frappe-datatable uses measureTextWidth() to size the # column, which can
+return inaccurate values. This replaces it with a simple digit-based formula:
+    digits * 8 + 30  (e.g. 1000 rows = 4 digits → 62px)
+
+Target file:
+    node_modules/frappe-datatable/dist/frappe-datatable.cjs.js  (v1.19.0)
+
+After patching, bench build --app frappe is run automatically to recompile
+the browser bundles.
 
 Usage:
-    bench --site pos execute rf.patches.patch_datatable_index_width.execute
+    bench --site <site> execute rf.patches.patch_datatable_index_width.execute
 """
 
 import os
-import re
+import subprocess
+
 import frappe
+
+
+OLD = """    getRowIndexColumnWidth() {
+        const rowCount = this.datamanager.getRowCount();
+        const padding = 22;
+        return $.measureTextWidth(rowCount + '') + padding;
+    }"""
+
+NEW = """    getRowIndexColumnWidth() {
+        const rowCount = this.datamanager.getRowCount();
+        const digits = (rowCount + '').length;
+        return digits * 8 + 30;
+    }"""
 
 
 def execute():
 	bench_path = frappe.utils.get_bench_path()
-	datatable_path = os.path.join(bench_path, "apps", "frappe", "node_modules", "frappe-datatable")
+	target = os.path.join(
+		bench_path,
+		"apps", "frappe", "node_modules",
+		"frappe-datatable", "dist", "frappe-datatable.cjs.js",
+	)
 
-	files_patched = 0
+	if not os.path.exists(target):
+		print(f"File not found: {target}")
+		return
 
-	# 1. Patch dist/frappe-datatable.js
-	dist_file = os.path.join(datatable_path, "dist", "frappe-datatable.js")
-	if os.path.exists(dist_file):
-		files_patched += _patch_dist(dist_file)
-
-	# 2. Patch dist/frappe-datatable.min.js
-	min_file = os.path.join(datatable_path, "dist", "frappe-datatable.min.js")
-	if os.path.exists(min_file):
-		files_patched += _patch_min(min_file)
-
-	# 3. Patch src/style.js
-	src_file = os.path.join(datatable_path, "src", "style.js")
-	if os.path.exists(src_file):
-		files_patched += _patch_dist(src_file)
-
-	if files_patched:
-		print(f"Datatable index width patch applied to {files_patched} file(s).")
-	else:
-		print("Patch already applied or files not found.")
-
-
-def _patch_dist(filepath):
-	"""Patch the readable JS files (dist and src)."""
-	with open(filepath, "r") as f:
+	with open(target, "r") as f:
 		content = f.read()
 
-	old = (
-		"getRowIndexColumnWidth() {\n"
-		"            const rowCount = this.datamanager.getRowCount();\n"
-		"            const padding = 22;\n"
-		"            return $.measureTextWidth(rowCount + '') + padding;\n"
-		"        }"
-	)
+	if NEW.strip() in content:
+		print("Already patched — nothing to do.")
+		return
 
-	# Handle src/style.js with different indentation
-	old_src = (
-		"getRowIndexColumnWidth() {\n"
-		"        const rowCount = this.datamanager.getRowCount();\n"
-		"        const padding = 22;\n"
-		"        return $.measureTextWidth(rowCount + '') + padding;\n"
-		"    }"
-	)
+	if OLD.strip() not in content:
+		print("Pattern not found — frappe-datatable version may have changed.")
+		print("Check getRowIndexColumnWidth() in:")
+		print(f"  {target}")
+		return
 
-	new_template = (
-		"getRowIndexColumnWidth() {{\n"
-		"{indent}const rowCount = this.datamanager.getRowCount();\n"
-		"{indent}const padding = 22;\n"
-		"{indent}const digits = (rowCount + '').length;\n"
-		"{indent}const minWidth = digits * 10 + padding;\n"
-		"{indent}const measuredWidth = $.measureTextWidth(rowCount + '') + padding;\n"
-		"{indent}return Math.max(measuredWidth, minWidth);\n"
-		"{close_indent}}}"
-	)
-
-	if old in content:
-		new_code = new_template.format(indent="            ", close_indent="        ")
-		content = content.replace(old, new_code)
-	elif old_src in content:
-		new_code = new_template.format(indent="        ", close_indent="    ")
-		content = content.replace(old_src, new_code)
-	else:
-		# Already patched or different version
-		if "minWidth" in content and "getRowIndexColumnWidth" in content:
-			print(f"  Already patched: {filepath}")
-			return 0
-		print(f"  Could not match pattern in: {filepath}")
-		return 0
-
-	with open(filepath, "w") as f:
+	content = content.replace(OLD, NEW)
+	with open(target, "w") as f:
 		f.write(content)
 
-	print(f"  Patched: {filepath}")
-	return 1
+	print(f"Patched: {target}")
 
+	# Rebuild browser bundles
+	print("\nRunning bench build --app frappe ...")
+	node_bin = _find_node18(bench_path)
+	env = os.environ.copy()
+	if node_bin:
+		env["PATH"] = os.path.dirname(node_bin) + ":" + env["PATH"]
+		print(f"Using node: {node_bin}")
 
-def _patch_min(filepath):
-	"""Patch the minified JS file."""
-	with open(filepath, "r") as f:
-		content = f.read()
-
-	old_min = "getRowIndexColumnWidth(){const t=this.datamanager.getRowCount();return e.measureTextWidth(t+\"\")+22}"
-	new_min = (
-		"getRowIndexColumnWidth(){"
-		"const t=this.datamanager.getRowCount(),n=22,i=(t+\"\").length,o=i*10+n,"
-		"s=e.measureTextWidth(t+\"\")+n;return Math.max(s,o)}"
+	result = subprocess.run(
+		["bench", "build", "--app", "frappe"],
+		cwd=bench_path,
+		env=env,
 	)
 
-	if old_min in content:
-		content = content.replace(old_min, new_min)
+	if result.returncode == 0:
+		print("\nDone. Hard-refresh your browser (Ctrl+Shift+R) to load the updated bundle.")
 	else:
-		if "minWidth" in content or ("Math.max" in content and "getRowIndexColumnWidth" in content):
-			print(f"  Already patched: {filepath}")
-			return 0
-		print(f"  Could not match pattern in: {filepath}")
-		return 0
+		print("\nbench build failed — you may need to run it manually:")
+		print("  source ~/.nvm/nvm.sh && nvm use 18 && bench build --app frappe")
 
-	with open(filepath, "w") as f:
-		f.write(content)
 
-	print(f"  Patched: {filepath}")
-	return 1
+def _find_node18(bench_path):
+	"""Try to find a Node >= 18 binary via nvm."""
+	nvm_dir = os.path.expanduser("~/.nvm/versions/node")
+	if not os.path.isdir(nvm_dir):
+		return None
+
+	candidates = []
+	for entry in os.listdir(nvm_dir):
+		try:
+			major = int(entry.lstrip("v").split(".")[0])
+			if major >= 18:
+				candidates.append((major, os.path.join(nvm_dir, entry, "bin", "node")))
+		except ValueError:
+			continue
+
+	if not candidates:
+		return None
+
+	# Pick highest available version
+	candidates.sort(reverse=True)
+	node_bin = candidates[0][1]
+	return node_bin if os.path.exists(node_bin) else None
