@@ -17,6 +17,9 @@ RF Whitelabel App for Frappe
 - Keep file sizes under **100KB** for faster loading
 - Use **transparent backgrounds** for logos (PNG or SVG)
 
+-- use following command to fix the Report Index issue for sr. no
+-- bench --site <site> execute rf.patches.patch_datatable_index_width.execute
+
 ### Installation
 
 You can install this app using the [bench](https://github.com/frappe/bench) CLI:
