@@ -97,7 +97,7 @@ update_website_context = "rf.api.get_website_context"
 
 # After Migrate
 # -------------
-after_migrate = ['rf.api.whitelabel_patch']
+after_migrate = ['rf.api.whitelabel_patch', 'rf.api.setup_note_company_field']
 
 # Boot Session
 # ------------

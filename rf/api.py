@@ -5,6 +5,23 @@ import json
 from frappe.utils import floor, flt, today, cint
 from frappe import _
 
+def setup_note_company_field():
+	"""Ensure the 'Restrict to Companies' custom field exists on Note doctype."""
+	if not frappe.db.exists("Custom Field", "Note-restrict_to_companies"):
+		frappe.get_doc({
+			"doctype": "Custom Field",
+			"dt": "Note",
+			"fieldname": "restrict_to_companies",
+			"fieldtype": "Table MultiSelect",
+			"label": "Restrict to Companies",
+			"options": "Note Restrict Company",
+			"insert_after": "expire_notification_on",
+			"permlevel": 1,
+			"description": "If set, popup only shows to users whose company (from Employee record) is listed here. Leave empty to show to all users."
+		}).insert(ignore_permissions=True)
+		frappe.db.commit()
+
+
 def whitelabel_patch():
 	#delete erpnext welcome page
 	frappe.delete_doc_if_exists('Page', 'welcome-to-erpnext', force=1)
