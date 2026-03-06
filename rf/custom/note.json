@@ -1,0 +1,19 @@
+[
+ {
+  "creation": "2026-03-06 00:00:00.000000",
+  "description": "If set, popup only shows to users whose company (from Employee record) is listed here. Leave empty to show to all users.",
+  "doctype": "Custom Field",
+  "dt": "Note",
+  "fieldname": "restrict_to_companies",
+  "fieldtype": "Table MultiSelect",
+  "insert_after": "expire_notification_on",
+  "label": "Restrict to Companies",
+  "modified": "2026-03-06 00:00:00.000000",
+  "modified_by": "Administrator",
+  "module": "",
+  "name": "Note-restrict_to_companies",
+  "options": "Note Restrict Company",
+  "owner": "Administrator",
+  "permlevel": 1
+ }
+]

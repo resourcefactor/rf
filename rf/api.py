@@ -19,8 +19,42 @@ def whitelabel_patch():
 
 def boot_session(bootinfo):
 	"""boot session - send website info if guest"""
-	if frappe.session['user']!='Guest':
-		bootinfo.whitelabel_setting = frappe.get_doc("Whitelabel Setting","Whitelabel Setting")
+	if frappe.session['user'] != 'Guest':
+		bootinfo.whitelabel_setting = frappe.get_doc("Whitelabel Setting", "Whitelabel Setting")
+		_filter_notes_by_company(bootinfo)
+
+
+def _filter_notes_by_company(bootinfo):
+	"""Filter login popup notes based on company restriction.
+
+	If a Note has entries in 'restrict_to_companies', only users whose
+	company (from their active Employee record) matches will see the popup.
+	Notes with no company restriction are shown to all users (default behavior).
+	"""
+	if not bootinfo.get("notes"):
+		return
+
+	user = frappe.session.user
+	user_company = (
+		frappe.db.get_value("Employee", {"user_id": user, "status": "Active"}, "company")
+		or frappe.db.get_value("User", user, "company")
+	)
+
+	filtered = []
+	for note in bootinfo.notes:
+		companies = frappe.db.get_all(
+			"Note Restrict Company",
+			filters={"parent": note.name},
+			pluck="company"
+		)
+		if not companies:
+			# No restriction set — show to all (preserves existing behavior)
+			filtered.append(note)
+		elif user_company and user_company in companies:
+			filtered.append(note)
+		# else: company-restricted note, user's company not in list — skip
+
+	bootinfo.notes = filtered
 
 def get_website_context(context):
 	"""Override website context for login and other public pages"""

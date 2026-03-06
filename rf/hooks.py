@@ -263,7 +263,9 @@ override_whitelisted_methods = {
 # Fixtures
 # --------
 fixtures = [
-    {"dt": "Custom Field", "filters": [["Translation","source_text","like","%ERPNext%"]]}
+    {"dt": "Custom Field", "filters": [["Translation", "source_text", "like", "%ERPNext%"]]},
+    {"dt": "Custom Field", "filters": [["dt", "=", "Note"], ["fieldname", "=", "restrict_to_companies"]]},
+    {"dt": "Note Restrict Company"},
 ]
 
 # Brand Settings
