@@ -17,7 +17,7 @@ def setup_note_company_field():
 			"options": "Note Restrict Company",
 			"insert_after": "expire_notification_on",
 			"permlevel": 1,
-			"description": "If set, popup only shows to users whose company (from Employee record) is listed here. Leave empty to show to all users."
+			"description": "If set, popup only shows to users who have User Permission access to one of the listed companies. Leave empty to show to all users."
 		}).insert(ignore_permissions=True)
 		frappe.db.commit()
 
@@ -44,17 +44,20 @@ def boot_session(bootinfo):
 def _filter_notes_by_company(bootinfo):
 	"""Filter login popup notes based on company restriction.
 
-	If a Note has entries in 'restrict_to_companies', only users whose
-	company (from their active Employee record) matches will see the popup.
+	If a Note has entries in 'restrict_to_companies', only users who have
+	a User Permission for at least one of those companies will see the popup.
 	Notes with no company restriction are shown to all users (default behavior).
 	"""
 	if not bootinfo.get("notes"):
 		return
 
 	user = frappe.session.user
-	user_company = (
-		frappe.db.get_value("Employee", {"user_id": user, "status": "Active"}, "company")
-		or frappe.db.get_value("User", user, "company")
+
+	# Get all companies this user has explicit User Permission access to
+	user_companies = frappe.db.get_all(
+		"User Permission",
+		filters={"user": user, "allow": "Company"},
+		pluck="for_value"
 	)
 
 	filtered = []
@@ -67,9 +70,10 @@ def _filter_notes_by_company(bootinfo):
 		if not companies:
 			# No restriction set — show to all (preserves existing behavior)
 			filtered.append(note)
-		elif user_company and user_company in companies:
+		elif any(c in user_companies for c in companies):
+			# User has permission for at least one of the restricted companies
 			filtered.append(note)
-		# else: company-restricted note, user's company not in list — skip
+		# else: company-restricted note, user has no matching permission — skip
 
 	bootinfo.notes = filtered
 
