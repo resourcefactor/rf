@@ -38,7 +38,13 @@ def boot_session(bootinfo):
 	"""boot session - send website info if guest"""
 	if frappe.session['user'] != 'Guest':
 		bootinfo.whitelabel_setting = frappe.get_doc("Whitelabel Setting", "Whitelabel Setting")
-		_filter_notes_by_company(bootinfo)
+
+
+def extend_bootinfo(bootinfo):
+	"""Runs after bootinfo.notes is set — filter notes by company restriction."""
+	if frappe.session['user'] == 'Guest':
+		return
+	_filter_notes_by_company(bootinfo)
 
 
 def _filter_notes_by_company(bootinfo):
@@ -73,7 +79,7 @@ def _filter_notes_by_company(bootinfo):
 		elif any(c in user_companies for c in companies):
 			# User has permission for at least one of the restricted companies
 			filtered.append(note)
-		# else: company-restricted note, user has no matching permission — skip
+		# else: company-restricted note, user has no matching User Permission — skip
 
 	bootinfo.notes = filtered
 

@@ -103,6 +103,9 @@ after_migrate = ['rf.api.whitelabel_patch', 'rf.api.setup_note_company_field']
 # ------------
 boot_session = "rf.api.boot_session"
 
+# Extend Bootinfo (runs after bootinfo.notes is set — correct place to filter notes)
+extend_bootinfo = ["rf.api.extend_bootinfo"]
+
 # Uninstallation
 # ------------
 
