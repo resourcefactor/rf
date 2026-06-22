@@ -1,0 +1,19 @@
+/* RF Whitelabel — Desk (app) styles */
+
+/* Hide the avatar when rf.js injects .rf-user-name */
+.navbar .nav-link .rf-user-name ~ .avatar,
+.navbar .nav-link .avatar:has(~ .rf-user-name) {
+	display: none !important;
+}
+
+/* User name badge */
+.navbar .rf-user-name {
+	display: inline-block !important;
+	padding: 6px 10px !important;
+	background: var(--dark-green-avatar-bg, #2c4e2e) !important;
+	color: var(--dark-green-avatar-color, #fff) !important;
+	border-radius: 4px !important;
+	font-size: 14px !important;
+	font-weight: 500 !important;
+	white-space: nowrap !important;
+}

@@ -25,8 +25,26 @@ app_license = "mit"
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = "/assets/rf/css/rf.css"
+app_include_css = "/assets/rf/css/whitelabel_app.css"
 app_include_js = "/assets/rf/js/rf.js"
+
+# include js, css files in header of web template
+web_include_css = "/assets/rf/css/whitelabel_web.css"
+web_include_js = ["/assets/rf/js/whitelabel_web.js"]
+
+# Fallback RF branding for login/splash pages (overridden per-site via Whitelabel Setting)
+website_context = {
+	"favicon": "/assets/rf/images/rf_ico.ico",
+	"splash_image": "/assets/rf/images/rf_svg.svg",
+}
+
+update_website_context = "rf.api.get_website_context"
+boot_session = "rf.api.boot_session"
+extend_bootinfo = ["rf.api.extend_bootinfo"]
+
+override_whitelisted_methods = {
+	"frappe.utils.change_log.show_update_popup": "rf.api.ignore_update_popup",
+}
 
 # include js, css files in header of web template
 # web_include_css = "/assets/rf/css/rf.css"

@@ -1,88 +1,120 @@
-// RF App main script
-console.log('RF App: script loaded');
+(function () {
+	'use strict';
 
-// Helper: wait until frappe and user info are loaded
-function waitForFrappeReady(cb, attempts = 50) { // ~5 seconds max
-    if (typeof frappe !== 'undefined' && frappe.boot && frappe.user) {
-        console.log('RF App: frappe is ready');
-        cb();
-    } else if (attempts > 0) {
-        setTimeout(() => waitForFrappeReady(cb, attempts - 1), 100);
-    } else {
-        console.warn('RF App: frappe not ready after waiting');
-    }
-}
+	function getSettings() {
+		return (frappe.boot && frappe.boot.rf_settings) || {};
+	}
 
-function runCustomizations() {
-    console.log('RF App: runCustomizations start');
-    // 1. Hide Help Menu based on RF Settings
-    frappe.db.get_single_value('RF Settings', 'hide_help_menu')
-        .then(hide => {
-            console.log('RF App: hide_help_menu value', hide);
-            if (hide) {
-                const $helpBtn = $('button[aria-label="Help Dropdown"]');
-                console.log('RF App: help button found', $helpBtn.length);
-                $helpBtn.hide();
-                $('.dropdown-help').hide();
-                $('[title="Help"]').hide();
-                $('[data-label="Help"]').hide();
-            }
-        })
-        .catch(err => console.warn('RF App: Could not fetch RF Settings', err));
+	function injectHelpMenuCSS() {
+		if (!getSettings().hide_help_menu) return;
+		if (document.getElementById('rf-hide-help-css')) return;
+		const style = document.createElement('style');
+		style.id = 'rf-hide-help-css';
+		// Hide top navbar help dropdown + its vertical separator bar
+		style.textContent = '.dropdown-help, .navbar .vertical-bar { display: none !important; }';
+		document.head.appendChild(style);
+	}
 
-    // 2. Display Full Name instead of Initial
-    try {
-        const user_name = frappe.user.full_name;
-        const $avatar = $('.navbar .avatar');
-        console.log('RF App: avatar found', $avatar.length);
-        if ($avatar.length) {
-            const $navLink = $avatar.closest('.nav-link');
-            if ($navLink.length) {
-                $avatar.hide();
-                if ($navLink.find('.rf-user-name').length === 0) {
-                    $navLink.append(`<span class="rf-user-name" style="margin-left: 8px; font-weight: 500;">${user_name}</span>`);
-                    console.log('RF App: added full name span');
-                }
-            }
-        }
-    } catch (e) {
-        console.error('RF App: Error setting full name', e);
-    }
+	function applyNavbarColor() {
+		const color = getSettings().navbar_background_color;
+		if (color) {
+			$('.navbar').css('background-color', color);
+		}
+	}
 
-    // 3. Change "ERPNext" to "ERP" in Sidebar Header
-    try {
-        const $sidebarTitle = $('.sidebar-header .sidebar-item-label.header-subtitle');
-        console.log('RF App: sidebar title found', $sidebarTitle.length, 'text:', $sidebarTitle.text());
-        if ($sidebarTitle.length && $sidebarTitle.text().trim() !== 'ERP') {
-            $sidebarTitle.text('ERP');
-            console.log('RF App: sidebar title changed to ERP');
-        }
-    } catch (e) {
-        console.error('RF App: Error changing sidebar title', e);
-    }
-    console.log('RF App: runCustomizations end');
-}
+	function applyNavbarTitle() {
+		const settings = getSettings();
+		if (!settings.custom_navbar_title) return;
+		if ($('#navbar-breadcrumbs').length && $('#rf-navbar-title').length === 0) {
+			const style = (settings.custom_navbar_title_style || '').replace(/\n/g, ' ');
+			$(`<span id="rf-navbar-title" style="${style}" class="hidden-xs hidden-sm">${settings.custom_navbar_title}</span>`).insertAfter('#navbar-breadcrumbs');
+		}
+	}
 
-function init() {
-    // Run after a short delay to ensure DOM is ready
-    setTimeout(runCustomizations, 200);
-    // Observe DOM changes with debounce
-    let timeout;
-    const observer = new MutationObserver(() => {
-        clearTimeout(timeout);
-        timeout = setTimeout(runCustomizations, 150);
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-    // ERPNext page change events
-    $(document).on('page-change', () => setTimeout(runCustomizations, 200));
-}
+	function updateUserDisplay() {
+		try {
+			if (!frappe.session.user || frappe.session.user === 'Guest') return;
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        console.log('RF App: DOMContentLoaded');
-        waitForFrappeReady(init);
-    });
-} else {
-    console.log('RF App: document already ready');
-    waitForFrappeReady(init);
-}
+			const full_name =
+				frappe.boot.user.full_name ||
+				(frappe.boot.user.first_name
+					? frappe.boot.user.first_name + (frappe.boot.user.last_name ? ' ' + frappe.boot.user.last_name : '')
+					: '') ||
+				'';
+
+			if (!full_name) return;
+
+			const names = full_name.trim().split(/\s+/);
+			const display_name =
+				names.length > 1
+					? names[0] + ' ' + names[names.length - 1].charAt(0).toUpperCase()
+					: names[0];
+
+			// v16 DOM: .navbar .avatar inside a .nav-link
+			const $avatar = $('.navbar .avatar');
+			if (!$avatar.length) return;
+			const $navLink = $avatar.closest('.nav-link');
+			if (!$navLink.length) return;
+
+			$avatar.hide();
+			if ($navLink.find('.rf-user-name').length === 0) {
+				$navLink.append(
+					`<span class="rf-user-name" style="display:inline-block;padding:6px 10px;background:var(--dark-green-avatar-bg,#2c4e2e);color:var(--dark-green-avatar-color,#fff);border-radius:4px;font-size:14px;font-weight:500;white-space:nowrap;">${display_name}</span>`
+				);
+			}
+		} catch (e) {
+			// ignore
+		}
+	}
+
+	function relabelSidebar() {
+		try {
+			const $title = $('.sidebar-header .sidebar-item-label.header-subtitle');
+			if ($title.length && $title.text().trim() !== 'ERP') {
+				$title.text('ERP');
+			}
+		} catch (e) {
+			// ignore
+		}
+	}
+
+	function runCustomizations() {
+		injectHelpMenuCSS();
+		applyNavbarColor();
+		applyNavbarTitle();
+		updateUserDisplay();
+		relabelSidebar();
+	}
+
+	function init() {
+		// Inject CSS immediately — persists across all DOM rebuilds, no timing issues
+		injectHelpMenuCSS();
+
+		// toolbar_setup fires after Frappe renders the navbar + sidebar header DOM
+		$(document).one('toolbar_setup', () => {
+			runCustomizations();
+			$(document).on('page-change', () => setTimeout(runCustomizations, 200));
+
+			let timeout;
+			const observer = new MutationObserver(() => {
+				clearTimeout(timeout);
+				timeout = setTimeout(runCustomizations, 150);
+			});
+			observer.observe(document.body, { childList: true, subtree: true });
+		});
+	}
+
+	function waitForFrappeReady(cb, attempts = 50) {
+		if (typeof frappe !== 'undefined' && frappe.boot && frappe.user) {
+			cb();
+		} else if (attempts > 0) {
+			setTimeout(() => waitForFrappeReady(cb, attempts - 1), 100);
+		}
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', () => waitForFrappeReady(init));
+	} else {
+		waitForFrappeReady(init);
+	}
+})();

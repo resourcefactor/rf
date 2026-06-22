@@ -1,40 +1,185 @@
 {
-    "actions": [],
-    "allow_rename": 1,
-    "creation": "2024-11-27 10:00:00.000000",
-    "doctype": "DocType",
-    "engine": "InnoDB",
-    "field_order": [
-        "hide_help_menu"
-    ],
-    "fields": [
-        {
-            "default": "0",
-            "fieldname": "hide_help_menu",
-            "fieldtype": "Check",
-            "label": "Hide Help Menu"
-        }
-    ],
-    "issingle": 1,
-    "links": [],
-    "modified": "2024-11-27 10:00:00.000000",
-    "modified_by": "Administrator",
-    "module": "Rf",
-    "name": "RF Settings",
-    "owner": "Administrator",
-    "permissions": [
-        {
-            "create": 1,
-            "delete": 1,
-            "email": 1,
-            "print": 1,
-            "read": 1,
-            "role": "System Manager",
-            "share": 1,
-            "write": 1
-        }
-    ],
-    "sort_field": "modified",
-    "sort_order": "DESC",
-    "states": []
+	"actions": [],
+	"allow_rename": 1,
+	"creation": "2024-11-27 10:00:00.000000",
+	"doctype": "DocType",
+	"engine": "InnoDB",
+	"field_order": [
+		"general_settings_tab",
+		"general_settings_section",
+		"hide_help_menu",
+		"column_break_gen_1",
+		"disable_new_update_popup",
+		"logo_settings_tab",
+		"logo_setting_section",
+		"navbar_logo",
+		"navbar_logo_description",
+		"column_break_logo_1",
+		"login_page_logo",
+		"login_logo_description",
+		"section_break_logo_2",
+		"splash_page_logo",
+		"splash_logo_description",
+		"column_break_logo_3",
+		"favicon",
+		"favicon_description",
+		"navbar_settings_tab",
+		"navbar_setting_section",
+		"navbar_background_color",
+		"whitelabel_app_name",
+		"column_break_nav_1",
+		"custom_navbar_title",
+		"custom_navbar_title_style"
+	],
+	"fields": [
+		{
+			"fieldname": "general_settings_tab",
+			"fieldtype": "Tab Break",
+			"label": "General Settings"
+		},
+		{
+			"fieldname": "general_settings_section",
+			"fieldtype": "Section Break",
+			"label": "UI Settings"
+		},
+		{
+			"default": "0",
+			"fieldname": "hide_help_menu",
+			"fieldtype": "Check",
+			"label": "Hide Help Menu"
+		},
+		{
+			"fieldname": "column_break_gen_1",
+			"fieldtype": "Column Break"
+		},
+		{
+			"default": "0",
+			"fieldname": "disable_new_update_popup",
+			"fieldtype": "Check",
+			"label": "Disable System Update Notification"
+		},
+		{
+			"fieldname": "logo_settings_tab",
+			"fieldtype": "Tab Break",
+			"label": "Logo Settings"
+		},
+		{
+			"fieldname": "logo_setting_section",
+			"fieldtype": "Section Break",
+			"label": "Logo Configuration"
+		},
+		{
+			"fieldname": "navbar_logo",
+			"fieldtype": "Attach Image",
+			"label": "Navbar Logo"
+		},
+		{
+			"fieldname": "navbar_logo_description",
+			"fieldtype": "HTML",
+			"label": "Navbar Logo Info",
+			"options": "<p style='color: #888; font-size: 12px;'><b>Best fit:</b> 200px × 30-40px | <b>Formats:</b> PNG, SVG (recommended), JPG</p>"
+		},
+		{
+			"fieldname": "column_break_logo_1",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "login_page_logo",
+			"fieldtype": "Attach Image",
+			"label": "Login Page Logo"
+		},
+		{
+			"fieldname": "login_logo_description",
+			"fieldtype": "HTML",
+			"label": "Login Logo Info",
+			"options": "<p style='color: #888; font-size: 12px;'><b>Best fit:</b> 400px × 100px | <b>Formats:</b> PNG, SVG (recommended), JPG</p>"
+		},
+		{
+			"fieldname": "section_break_logo_2",
+			"fieldtype": "Section Break"
+		},
+		{
+			"fieldname": "splash_page_logo",
+			"fieldtype": "Attach Image",
+			"label": "Splash Page Logo"
+		},
+		{
+			"fieldname": "splash_logo_description",
+			"fieldtype": "HTML",
+			"label": "Splash Logo Info",
+			"options": "<p style='color: #888; font-size: 12px;'><b>Best fit:</b> 512px × 512px (square) | <b>Formats:</b> PNG, SVG (recommended)</p>"
+		},
+		{
+			"fieldname": "column_break_logo_3",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "favicon",
+			"fieldtype": "Attach Image",
+			"label": "Favicon"
+		},
+		{
+			"fieldname": "favicon_description",
+			"fieldtype": "HTML",
+			"label": "Favicon Info",
+			"options": "<p style='color: #888; font-size: 12px;'><b>Best fit:</b> 32×32px or 192×192px | <b>Formats:</b> ICO, PNG</p>"
+		},
+		{
+			"fieldname": "navbar_settings_tab",
+			"fieldtype": "Tab Break",
+			"label": "Navbar Settings"
+		},
+		{
+			"fieldname": "navbar_setting_section",
+			"fieldtype": "Section Break"
+		},
+		{
+			"description": "Hex color code e.g. #1a1a1a",
+			"fieldname": "navbar_background_color",
+			"fieldtype": "Data",
+			"label": "Navbar Background Color"
+		},
+		{
+			"fieldname": "whitelabel_app_name",
+			"fieldtype": "Data",
+			"label": "App Name"
+		},
+		{
+			"fieldname": "column_break_nav_1",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "custom_navbar_title",
+			"fieldtype": "Data",
+			"label": "Navbar Title"
+		},
+		{
+			"fieldname": "custom_navbar_title_style",
+			"fieldtype": "Code",
+			"label": "Navbar Title Style"
+		}
+	],
+	"issingle": 1,
+	"links": [],
+	"modified": "2026-06-20 00:00:00.000000",
+	"modified_by": "Administrator",
+	"module": "Rf",
+	"name": "RF Settings",
+	"owner": "Administrator",
+	"permissions": [
+		{
+			"create": 1,
+			"delete": 1,
+			"email": 1,
+			"print": 1,
+			"read": 1,
+			"role": "System Manager",
+			"share": 1,
+			"write": 1
+		}
+	],
+	"sort_field": "modified",
+	"sort_order": "DESC",
+	"states": [],
+	"track_changes": 1
 }
