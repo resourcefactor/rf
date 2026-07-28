@@ -231,6 +231,16 @@ def rename_erpnext_workspaces():
 	print("Workspace title updates completed!")
 
 
+def check_user_permission_manager_access():
+	"""Allow anyone with access to the User Permission Manager Page (whatever
+	roles are configured there) rather than hardcoding a System Manager check.
+	Mirrors Page.is_permitted(): open to all if no roles are set on the page.
+	"""
+	page = frappe.get_cached_doc("Page", "user-permission-manager")
+	if not page.is_permitted():
+		frappe.throw(_("Not permitted to access User Permission Manager"), frappe.PermissionError)
+
+
 @frappe.whitelist()
 def get_user_permission_manager_data(user, allow, applicable_for=None, apply_to_all_doctypes=1):
 	"""Return existing User Permission for_values for the given user+allow+scope.
@@ -240,7 +250,7 @@ def get_user_permission_manager_data(user, allow, applicable_for=None, apply_to_
 	User Permission's own duplicate check uses, so the UI can never disagree
 	with what the server considers a duplicate).
 	"""
-	frappe.only_for("System Manager")
+	check_user_permission_manager_access()
 	return frappe.get_all(
 		"User Permission",
 		filters={
@@ -263,7 +273,7 @@ def save_user_permission_manager_selection(
 	Rows that fail validation (e.g. a duplicate default) are skipped rather than
 	aborting the whole batch, so one bad row doesn't block the rest of the save.
 	"""
-	frappe.only_for("System Manager")
+	check_user_permission_manager_access()
 
 	if isinstance(to_add, str):
 		to_add = json.loads(to_add)
