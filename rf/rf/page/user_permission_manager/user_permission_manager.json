@@ -1,0 +1,14 @@
+{
+ "doctype": "Page",
+ "icon": "fa fa-user-check",
+ "module": "Rf",
+ "name": "user-permission-manager",
+ "page_name": "user-permission-manager",
+ "roles": [
+  {
+   "role": "System Manager"
+  }
+ ],
+ "standard": "Yes",
+ "title": "User Permission Manager"
+}

@@ -1,0 +1,50 @@
+.upm-filters {
+	background: var(--card-bg, var(--fg-color));
+	border: 1px solid var(--border-color);
+	border-radius: var(--border-radius-md, 8px);
+	padding: 16px 16px 4px;
+}
+
+.upm-filters .frappe-control {
+	margin-bottom: 12px;
+}
+
+.upm-cap-note {
+	padding: 4px 2px;
+}
+
+.upm-grid {
+	background: var(--card-bg, var(--fg-color));
+	border: 1px solid var(--border-color);
+	border-radius: var(--border-radius-md, 8px);
+	padding: 16px;
+	margin-top: 12px;
+}
+
+.upm-grid .bulk-select-options {
+	margin-bottom: 12px;
+}
+
+.upm-grid .checkbox-options {
+	padding: 0 !important;
+}
+
+.upm-grid .unit-checkbox {
+	padding: 6px 8px;
+	border-radius: 6px;
+	transition: background-color 0.15s ease;
+}
+
+.upm-grid .unit-checkbox:hover {
+	background: var(--control-bg, var(--bg-color));
+}
+
+.upm-grid .unit-checkbox label {
+	margin: 0;
+	cursor: pointer;
+}
+
+.upm-grid .unit-checkbox input[type="checkbox"] {
+	margin-right: 8px;
+	cursor: pointer;
+}

@@ -4,6 +4,7 @@ import re
 import json
 from frappe.utils import floor, flt, today, cint
 from frappe import _
+from frappe.core.doctype.user_permission.user_permission import insert_user_perm
 
 def setup_note_company_field():
 	"""Ensure the 'Restrict to Companies' custom field exists on Note doctype."""
@@ -228,3 +229,87 @@ def rename_erpnext_workspaces():
 	print("Clearing all caches...")
 	frappe.clear_cache()
 	print("Workspace title updates completed!")
+
+
+@frappe.whitelist()
+def get_user_permission_manager_data(user, allow, applicable_for=None, apply_to_all_doctypes=1):
+	"""Return existing User Permission for_values for the given user+allow+scope.
+
+	Used by the User Permission Manager page to pre-check the checkbox grid
+	against what's already saved for this exact scope (same tuple that
+	User Permission's own duplicate check uses, so the UI can never disagree
+	with what the server considers a duplicate).
+	"""
+	frappe.only_for("System Manager")
+	return frappe.get_all(
+		"User Permission",
+		filters={
+			"user": user,
+			"allow": allow,
+			"applicable_for": applicable_for or None,
+			"apply_to_all_doctypes": cint(apply_to_all_doctypes),
+		},
+		pluck="for_value",
+	)
+
+
+@frappe.whitelist()
+def save_user_permission_manager_selection(
+	user, allow, to_add, to_remove, applicable_for=None,
+	apply_to_all_doctypes=1, hide_descendants=0, is_default=0,
+):
+	"""Bulk create/delete User Permission rows for one user+allow from a checkbox diff.
+
+	Rows that fail validation (e.g. a duplicate default) are skipped rather than
+	aborting the whole batch, so one bad row doesn't block the rest of the save.
+	"""
+	frappe.only_for("System Manager")
+
+	if isinstance(to_add, str):
+		to_add = json.loads(to_add)
+	if isinstance(to_remove, str):
+		to_remove = json.loads(to_remove)
+
+	if cint(is_default) and len(to_add) > 1:
+		frappe.throw(_("Is Default can only be applied when adding a single new permission."))
+
+	added = []
+	skipped = []
+	for idx, for_value in enumerate(to_add):
+		savepoint_name = f"user_perm_add_{idx}"
+		frappe.db.savepoint(savepoint_name)
+		try:
+			insert_user_perm(
+				user,
+				allow,
+				for_value,
+				is_default=is_default,
+				hide_descendants=hide_descendants,
+				apply_to_all=cint(apply_to_all_doctypes) or None,
+				applicable=applicable_for if not cint(apply_to_all_doctypes) else None,
+			)
+			added.append(for_value)
+		except frappe.ValidationError as e:
+			frappe.db.rollback(save_point=savepoint_name)
+			frappe.clear_last_message()
+			skipped.append({"value": for_value, "reason": str(e)})
+
+	if to_remove:
+		frappe.db.delete(
+			"User Permission",
+			{
+				"user": user,
+				"allow": allow,
+				"for_value": ["in", to_remove],
+				"applicable_for": applicable_for or None,
+				"apply_to_all_doctypes": cint(apply_to_all_doctypes),
+			},
+		)
+		frappe.clear_cache()
+
+	frappe.logger().info(
+		f"[UserPermissionManager] user={user} allow={allow} added={len(added)} "
+		f"skipped={len(skipped)} removed={len(to_remove)}"
+	)
+
+	return {"added": len(added), "skipped": skipped, "removed": len(to_remove)}
