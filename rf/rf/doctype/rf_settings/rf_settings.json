@@ -29,7 +29,10 @@
 		"whitelabel_app_name",
 		"column_break_nav_1",
 		"custom_navbar_title",
-		"custom_navbar_title_style"
+		"custom_navbar_title_style",
+		"accounts_settings_tab",
+		"accounts_settings_section",
+		"bypass_currency_validation"
 	],
 	"fields": [
 		{
@@ -157,11 +160,28 @@
 			"fieldname": "custom_navbar_title_style",
 			"fieldtype": "Code",
 			"label": "Navbar Title Style"
+		},
+		{
+			"fieldname": "accounts_settings_tab",
+			"fieldtype": "Tab Break",
+			"label": "Accounts Settings"
+		},
+		{
+			"fieldname": "accounts_settings_section",
+			"fieldtype": "Section Break",
+			"label": "Currency Validation"
+		},
+		{
+			"default": "0",
+			"description": "When checked, the core ERPNext currency validation on Accounts Controller transactions (e.g. Sales/Purchase Invoice) and GL Entry is skipped.",
+			"fieldname": "bypass_currency_validation",
+			"fieldtype": "Check",
+			"label": "Bypass Currency Validation"
 		}
 	],
 	"issingle": 1,
 	"links": [],
-	"modified": "2026-06-20 00:00:00.000000",
+	"modified": "2026-08-06 00:00:00.000000",
 	"modified_by": "Administrator",
 	"module": "Rf",
 	"name": "RF Settings",
