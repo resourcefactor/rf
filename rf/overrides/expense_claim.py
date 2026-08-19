@@ -1,4 +1,5 @@
-"""Fix Expense Claim GL entries for foreign-currency claims paid against company-currency accounts.
+"""Fix Expense Claim GL entries and outstanding-amount calculations for foreign-currency claims
+paid against company-currency accounts.
 
 `ExpenseClaim.get_gl_entries()` (hrms/hr/doctype/expense_claim/expense_claim.py) hardcodes
 `account_currency=self.currency` on every GL line, and fills `debit_in_account_currency` /
@@ -15,16 +16,25 @@ Payment Entry reference built from it.
 This patch corrects those GL lines after the fact: for any line whose account is genuinely
 held in company currency, it re-points account_currency there and uses the already-correct
 base_ amount as the account-currency amount too.
+
+`get_outstanding_amount_for_claim()` has a parallel bug: it computes
+    total_sanctioned_amount (foreign) - total_amount_reimbursed (company currency) - ...
+which mixes currencies and produces a nonsense outstanding (e.g. CNY 10,000 - AED 599.50 =
+9,400.50 AED stored back into the Payment Entry Reference row). This patch replaces that
+function with one that uses base_ (company-currency) amounts for foreign-currency claims,
+matching what update_outstanding_amount_in_payment_entry then writes to the PE Reference.
 """
 
 import frappe
 from frappe.utils import cstr, flt
 
 import erpnext
+import hrms.hr.doctype.expense_claim.expense_claim as hrms_expense_claim
 from erpnext.accounts.utils import get_account_currency
 from hrms.hr.doctype.expense_claim.expense_claim import ExpenseClaim
 
 _original_get_gl_entries = ExpenseClaim.get_gl_entries
+_original_get_outstanding_amount_for_claim = hrms_expense_claim.get_outstanding_amount_for_claim
 
 
 def expense_claim_get_gl_entries(self):
@@ -97,6 +107,69 @@ def expense_claim_set_status(self, update=False):
 		self.status = status
 
 
+def get_outstanding_amount_for_claim(claim):
+	"""Patched version that uses base (company-currency) amounts for foreign-currency claims.
+
+	The original computes:
+	    total_sanctioned_amount (claim currency) - total_amount_reimbursed (payable account currency)
+	For foreign-currency claims reimbursed through a company-currency account, those two values
+	are in different currencies, so the subtraction produces a nonsense result (e.g.
+	CNY 10,000 - AED 599.50 = 9,400.50) that then gets written back into the Payment Entry
+	Reference outstanding_amount field by update_outstanding_amount_in_payment_entry().
+
+	For same-currency claims the original logic is unchanged.
+	"""
+	precision = frappe.get_precision("Expense Claim", "grand_total")
+
+	if isinstance(claim, str):
+		claim = frappe.db.get_value(
+			"Expense Claim",
+			claim,
+			(
+				"total_sanctioned_amount",
+				"total_taxes_and_charges",
+				"total_amount_reimbursed",
+				"total_advance_amount",
+				"base_total_sanctioned_amount",
+				"base_total_taxes_and_charges",
+				"base_total_advance_amount",
+				"currency",
+				"company",
+			),
+			as_dict=True,
+		)
+
+	company_currency = erpnext.get_company_currency(claim.company)
+
+	if claim.currency != company_currency:
+		# total_amount_reimbursed is accumulated from GL/Payment Ledger entries already
+		# posted in the payable account's currency (company currency), so it needs no
+		# conversion — only the sanctioned/advance amounts must be switched to base_.
+		outstanding_amt = (
+			flt(claim.base_total_sanctioned_amount)
+			+ flt(claim.base_total_taxes_and_charges)
+			- flt(claim.total_amount_reimbursed)
+			- flt(claim.base_total_advance_amount)
+		)
+	else:
+		outstanding_amt = (
+			flt(claim.total_sanctioned_amount)
+			+ flt(claim.total_taxes_and_charges)
+			- flt(claim.total_amount_reimbursed)
+			- flt(claim.total_advance_amount)
+		)
+
+	return flt(outstanding_amt, precision)
+
+
 def apply():
 	ExpenseClaim.get_gl_entries = expense_claim_get_gl_entries
 	ExpenseClaim.set_status = expense_claim_set_status
+	# Patch the module-level function so update_outstanding_amount_in_payment_entry (and any
+	# other caller that imports from the module) picks up the fixed version.
+	hrms_expense_claim.get_outstanding_amount_for_claim = get_outstanding_amount_for_claim
+	# Also re-bind the name in hrms.overrides.employee_payment_entry, which imported the
+	# function by name at module load time and therefore holds a stale reference.
+	import hrms.overrides.employee_payment_entry as hrms_epe
+
+	hrms_epe.get_outstanding_amount_for_claim = get_outstanding_amount_for_claim
