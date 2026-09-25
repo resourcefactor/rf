@@ -43,7 +43,7 @@ web_include_js = ["/assets/rf/js/whitelabel_web.js?v=3"]
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-# doctype_js = {"doctype" : "public/js/doctype.js"}
+doctype_js = {"Company": "public/js/company.js"}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -157,6 +157,12 @@ extend_bootinfo = ["rf.api.extend_bootinfo"]
 # Document Events
 # ---------------
 # Hook on document methods and events
+
+doc_events = {
+	"Transaction Deletion Record": {
+		"before_insert": "rf.api.validate_transaction_deletion_permission",
+	},
+}
 
 # doc_events = {
 # 	"*": {

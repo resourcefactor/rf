@@ -38,7 +38,11 @@ def whitelabel_patch():
 def boot_session(bootinfo):
 	"""boot session - send website info if guest"""
 	if frappe.session['user'] != 'Guest':
-		bootinfo.whitelabel_setting = frappe.get_doc("Whitelabel Setting", "Whitelabel Setting")
+		setting = frappe.get_doc("Whitelabel Setting", "Whitelabel Setting")
+		# don't ship the allowed-users list to every browser session
+		setting.set("transaction_deletion_users", [])
+		bootinfo.whitelabel_setting = setting
+		bootinfo.rf_can_delete_company_transactions = can_delete_company_transactions()
 
 
 def extend_bootinfo(bootinfo):
@@ -323,3 +327,25 @@ def save_user_permission_manager_selection(
 	)
 
 	return {"added": len(added), "skipped": skipped, "removed": len(to_remove)}
+
+
+def can_delete_company_transactions(user=None):
+	"""Administrator, plus any user listed in Whitelabel Setting > Users Allowed to Delete Transactions."""
+	user = user or frappe.session.user
+	if user == "Administrator":
+		return True
+	return bool(
+		frappe.db.exists(
+			"RF Transaction Deletion User",
+			{"parent": "Whitelabel Setting", "parenttype": "Whitelabel Setting", "user": user},
+		)
+	)
+
+
+def validate_transaction_deletion_permission(doc, method=None):
+	"""before_insert on Transaction Deletion Record; covers the Company button and direct creation."""
+	if not can_delete_company_transactions():
+		frappe.throw(
+			_("Only Administrator or users allowed in Whitelabel Setting can delete company transactions."),
+			frappe.PermissionError,
+		)

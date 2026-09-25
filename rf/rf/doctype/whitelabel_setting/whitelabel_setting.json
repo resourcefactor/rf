@@ -31,7 +31,10 @@
   "whitelabel_app_name",
   "column_break_7",
   "custom_navbar_title",
-  "custom_navbar_title_style"
+  "custom_navbar_title_style",
+  "transaction_deletion_tab",
+  "transaction_deletion_section",
+  "transaction_deletion_users"
  ],
  "fields": [
   {
@@ -173,6 +176,23 @@
    "fieldname": "custom_navbar_title_style",
    "fieldtype": "Code",
    "label": "Navbar Title Style"
+  },
+  {
+   "fieldname": "transaction_deletion_tab",
+   "fieldtype": "Tab Break",
+   "label": "Accounts Settings"
+  },
+  {
+   "fieldname": "transaction_deletion_section",
+   "fieldtype": "Section Break",
+   "label": "Delete Company Transactions"
+  },
+  {
+   "description": "Only Administrator and the users listed here can see and use \"Delete Transactions\" on Company. Leave empty to restrict it to Administrator only.",
+   "fieldname": "transaction_deletion_users",
+   "fieldtype": "Table",
+   "label": "Users Allowed to Delete Transactions",
+   "options": "RF Transaction Deletion User"
   }
  ],
  "issingle": 1,
