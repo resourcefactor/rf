@@ -4,7 +4,11 @@ import frappe
 def boot_session(bootinfo):
 	"""Attach RF Settings to bootinfo so the desk JS can read branding config without an extra API call."""
 	if frappe.session["user"] != "Guest":
-		bootinfo.rf_settings = frappe.get_doc("RF Settings", "RF Settings").as_dict()
+		settings = frappe.get_doc("RF Settings", "RF Settings").as_dict()
+		# don't ship the allowed-users list to every browser session
+		settings.pop("transaction_deletion_users", None)
+		bootinfo.rf_settings = settings
+		bootinfo.rf_can_delete_company_transactions = can_delete_company_transactions()
 
 
 _HIDE_HELP_LABELS = {"About", "Frappe Support"}
@@ -94,3 +98,24 @@ def ignore_update_popup():
 		from frappe.utils.change_log import show_update_popup
 
 		show_update_popup()
+
+
+def can_delete_company_transactions(user=None):
+	"""Administrator, plus any user listed in RF Settings > Users Allowed to Delete Transactions."""
+	user = user or frappe.session.user
+	if user == "Administrator":
+		return True
+	return bool(
+		frappe.db.exists(
+			"RF Transaction Deletion User", {"parent": "RF Settings", "parenttype": "RF Settings", "user": user}
+		)
+	)
+
+
+def validate_transaction_deletion_permission(doc, method=None):
+	"""before_insert on Transaction Deletion Record; covers the Company button and direct creation."""
+	if not can_delete_company_transactions():
+		frappe.throw(
+			frappe._("Only Administrator or users allowed in RF Settings can delete company transactions."),
+			frappe.PermissionError,
+		)

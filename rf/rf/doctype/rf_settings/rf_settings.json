@@ -32,7 +32,9 @@
 		"custom_navbar_title_style",
 		"accounts_settings_tab",
 		"accounts_settings_section",
-		"bypass_currency_validation"
+		"bypass_currency_validation",
+		"transaction_deletion_section",
+		"transaction_deletion_users"
 	],
 	"fields": [
 		{
@@ -177,6 +179,18 @@
 			"fieldname": "bypass_currency_validation",
 			"fieldtype": "Check",
 			"label": "Bypass Currency Validation"
+		},
+		{
+			"fieldname": "transaction_deletion_section",
+			"fieldtype": "Section Break",
+			"label": "Delete Company Transactions"
+		},
+		{
+			"description": "Only Administrator and the users listed here can see and use \"Delete Transactions\" on Company. Leave empty to restrict it to Administrator only.",
+			"fieldname": "transaction_deletion_users",
+			"fieldtype": "Table",
+			"label": "Users Allowed to Delete Transactions",
+			"options": "RF Transaction Deletion User"
 		}
 	],
 	"issingle": 1,
