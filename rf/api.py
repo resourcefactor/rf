@@ -130,32 +130,31 @@ def update_system_settings(brand_name):
 	frappe.db.commit()
 
 def update_onboard_details(brand_name):
+	"""Rebrand onboarding with db.set_value. On developer mode sites doc.save() exports the doc into the
+	owning app's JSON, which every site on the bench then imports, along with that site's roles."""
 	update_onboard_module(brand_name)
 	update_onboard_steps(brand_name)
 
 def update_onboard_module(brand_name):
-	onboard_module_details = frappe.get_all("Module Onboarding",filters={},fields=["name"])
+	onboard_module_details = frappe.get_all("Module Onboarding",filters={},fields=["name","title","success_message"])
 	for row in onboard_module_details:
-		doc = frappe.get_doc("Module Onboarding",row.name)
-		doc.title = re.sub("ERPNext", brand_name, doc.title)
-		doc.success_message = re.sub("ERPNext", brand_name, doc.success_message)
-		doc.documentation_url = ""
-		doc.flags.ignore_mandatory = True
-		doc.save(ignore_permissions = True)
+		frappe.db.set_value("Module Onboarding", row.name, {
+			"title": re.sub("ERPNext", brand_name, row.title),
+			"success_message": re.sub("ERPNext", brand_name, row.success_message),
+			"documentation_url": "",
+		})
 
 def update_onboard_steps(brand_name):
-	onboard_steps_details = frappe.get_all("Onboarding Step",filters={},fields=["name"])
+	onboard_steps_details = frappe.get_all("Onboarding Step",filters={},fields=["name","title","description"])
 	for row in onboard_steps_details:
-		doc = frappe.get_doc("Onboarding Step",row.name)
-		if doc.title:
-			doc.title = re.sub("ERPNext", brand_name, doc.title)
-		if doc.description:
-			doc.description = re.sub("ERPNext", brand_name, doc.description)
-		doc.intro_video_url = ""
-		if doc.title == "Introduction to Website":
-			doc.video_url = ""
-		doc.flags.ignore_mandatory = True
-		doc.save(ignore_permissions = True)
+		values = {"intro_video_url": ""}
+		if row.title:
+			values["title"] = re.sub("ERPNext", brand_name, row.title)
+		if row.description:
+			values["description"] = re.sub("ERPNext", brand_name, row.description)
+		if row.title == "Introduction to Website":
+			values["video_url"] = ""
+		frappe.db.set_value("Onboarding Step", row.name, values)
 
 @frappe.whitelist()
 def show_update_popup_update():
