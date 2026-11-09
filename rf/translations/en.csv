@@ -1,0 +1,34 @@
+ERPNext,ERP
+ERPNext Settings,ERP Settings
+ERPNext Integrations,ERP Integrations
+ERPNext Integrations (Custom),ERP Integrations
+Frappe HR,HR
+Frappe CRM,CRM
+Get to know ERPNext,Get to know ERP
+Get to know Frappe HR,Get to know HR
+Open Frappe CRM,Open CRM
+Switch to Frappe CRM,Switch to CRM
+Open Frappe Helpdesk,Open Helpdesk
+ERPNext User ID,ERP User ID
+ERPNext Site URL,ERP Site URL
+ERPNext Site API's,ERP Site API's
+Company in ERPNext site,Company in ERP site
+Is ERPNext installed on a different site?,Is ERP installed on a different site?
+Enable Frappe CRM Data Synchronization,Enable CRM Data Synchronization
+Fiscal Year (requires ERPNext to be installed),Fiscal Year (requires ERP to be installed)
+Company Abbreviation (requires ERPNext to be installed),Company Abbreviation (requires ERP to be installed)
+ERPNext will make a stock ledger entry for each transaction of this item. Keep unchecked for non-stock or service items.,ERP will make a stock ledger entry for each transaction of this item. Keep unchecked for non-stock or service items.
+"Something you bought before using ERPNext, with what you paid, where it is, and how much has already depreciated. See [Asset](https://docs.frappe.io/erpnext/user/manual/en/asset).","Something you bought before using ERP, with what you paid, where it is, and how much has already depreciated."
+"STEP, STL or GLB file of a material added in ERPNext, used to place it in the 3D model.","STEP, STL or GLB file of a material added in ERP, used to place it in the 3D model."
+Allowed Users is required for data synchronization from remote Frappe CRM site.,Allowed Users is required for data synchronization from remote CRM site.
+Allowed Users is not required as Frappe CRM is already installed on the site.,Allowed Users is not required as CRM is already installed on the site.
+ERPNext custom fields not created,ERP custom fields not created
+ERPNext integration must be enabled on the same site,ERP integration must be enabled on the same site
+ERPNext is not installed in the current site,ERP is not installed in the current site
+ERPNext is not integrated with the CRM,ERP is not integrated with the CRM
+Frappe CRM data synchronization is not enabled on ERPNext. Contact System Manager of ERPNext.,CRM data synchronization is not enabled on ERP. Contact System Manager of ERP.
+[Important] [ERPNext] Auto Reorder Errors,[Important] [ERP] Auto Reorder Errors
+Use ERPNext to Create Products,Use ERP to Create Products
+WARNING: Loan Management module has been separated from ERPNext.,WARNING: Loan Management module has been separated from ERP.
+You do not have permission to access Frappe CRM,You do not have permission to access CRM
+The 3D viewer files are missing. Run yarn install for ERPNext.,The 3D viewer files are missing. Run yarn install for ERP.

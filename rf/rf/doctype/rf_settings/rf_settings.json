@@ -8,6 +8,7 @@
 		"general_settings_tab",
 		"general_settings_section",
 		"hide_help_menu",
+		"whitelabel_app_name",
 		"column_break_gen_1",
 		"disable_new_update_popup",
 		"logo_settings_tab",
@@ -23,13 +24,6 @@
 		"column_break_logo_3",
 		"favicon",
 		"favicon_description",
-		"navbar_settings_tab",
-		"navbar_setting_section",
-		"navbar_background_color",
-		"whitelabel_app_name",
-		"column_break_nav_1",
-		"custom_navbar_title",
-		"custom_navbar_title_style",
 		"accounts_settings_tab",
 		"accounts_settings_section",
 		"bypass_currency_validation",
@@ -49,6 +43,7 @@
 		},
 		{
 			"default": "0",
+			"description": "Hides Frappe Support, About, documentation and video links for all users; System Managers keep System Health. Re-applied after every migrate.",
 			"fieldname": "hide_help_menu",
 			"fieldtype": "Check",
 			"label": "Hide Help Menu"
@@ -130,38 +125,10 @@
 			"options": "<p style='color: #888; font-size: 12px;'><b>Best fit:</b> 32×32px or 192×192px | <b>Formats:</b> ICO, PNG</p>"
 		},
 		{
-			"fieldname": "navbar_settings_tab",
-			"fieldtype": "Tab Break",
-			"label": "Navbar Settings"
-		},
-		{
-			"fieldname": "navbar_setting_section",
-			"fieldtype": "Section Break"
-		},
-		{
-			"description": "Hex color code e.g. #1a1a1a",
-			"fieldname": "navbar_background_color",
-			"fieldtype": "Data",
-			"label": "Navbar Background Color"
-		},
-		{
+			"description": "Application name shown in the desk and emails. Leave empty to keep the site's own name (vendor defaults such as Frappe or ERPNext become ERP).",
 			"fieldname": "whitelabel_app_name",
 			"fieldtype": "Data",
 			"label": "App Name"
-		},
-		{
-			"fieldname": "column_break_nav_1",
-			"fieldtype": "Column Break"
-		},
-		{
-			"fieldname": "custom_navbar_title",
-			"fieldtype": "Data",
-			"label": "Navbar Title"
-		},
-		{
-			"fieldname": "custom_navbar_title_style",
-			"fieldtype": "Code",
-			"label": "Navbar Title Style"
 		},
 		{
 			"fieldname": "accounts_settings_tab",
@@ -195,7 +162,7 @@
 	],
 	"issingle": 1,
 	"links": [],
-	"modified": "2026-08-06 00:00:00.000000",
+	"modified": "2026-11-07 12:00:00.000000",
 	"modified_by": "Administrator",
 	"module": "Rf",
 	"name": "RF Settings",

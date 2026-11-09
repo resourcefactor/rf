@@ -2,57 +2,51 @@ import frappe
 from frappe.installer import update_site_config
 from frappe.model.document import Document
 
+from rf.whitelabel import apply_whitelabel, save_if_changed
+
 
 class RFSettings(Document):
-	def validate(self):
-		system_settings_doc = frappe.get_doc("System Settings", "System Settings")
-		navbar_settings_doc = frappe.get_doc("Navbar Settings", "Navbar Settings")
-		website_doc = frappe.get_doc("Website Settings", "Website Settings")
-		self.set_app_name(system_settings_doc)
-		self.set_logo_settings(navbar_settings_doc, website_doc)
-		self.set_log_notification(system_settings_doc)
-		system_settings_doc.save(ignore_permissions=True)
-		navbar_settings_doc.save(ignore_permissions=True)
-		website_doc.save(ignore_permissions=True)
-
-	def set_app_name(self, system_settings_doc):
-		if self.whitelabel_app_name:
-			system_settings_doc.app_name = self.whitelabel_app_name
-		else:
-			if "erpnext" in frappe.get_installed_apps():
-				system_settings_doc.app_name = "ERPNext"
-			else:
-				system_settings_doc.app_name = "Frappe"
-
-	def set_logo_settings(self, navbar_settings_doc, website_doc):
-		if self.navbar_logo:
-			navbar_settings_doc.app_logo = self.navbar_logo
-			website_doc.app_logo = self.navbar_logo
-			update_site_config("app_logo_url", self.navbar_logo)
-		else:
-			navbar_settings_doc.app_logo = ""
-			website_doc.app_logo = ""
-			update_site_config("app_logo_url", False)
-
-		if self.login_page_logo:
-			update_site_config("login_logo_url", self.login_page_logo)
-		else:
-			update_site_config("login_logo_url", False)
-
-		if self.splash_page_logo:
-			website_doc.splash_image = self.splash_page_logo
-		else:
-			website_doc.splash_image = ""
-
-		if self.favicon:
-			website_doc.favicon = self.favicon
-			update_site_config("favicon", self.favicon)
-		else:
-			website_doc.favicon = ""
-			update_site_config("favicon", False)
-
+	def on_update(self):
+		self.push_logos()
+		self.push_update_notifications()
+		# App name, help rows, footers, CRM rows and onboarding (also re-run after every migrate).
+		apply_whitelabel(self)
 		frappe.clear_cache()
 
-	def set_log_notification(self, system_settings_doc):
-		system_settings_doc.disable_system_update_notification = self.disable_new_update_popup
-		system_settings_doc.disable_change_log_notification = self.disable_new_update_popup
+	def push_logos(self):
+		"""Copy logos that are set into the core settings.
+
+		An empty field leaves Website/Navbar Settings alone, so logos configured there directly are
+		never wiped. The site_config keys are owned by this app, so they follow the field exactly.
+		"""
+		website = frappe.get_single("Website Settings")
+		navbar = frappe.get_single("Navbar Settings")
+		website_values, navbar_values = {}, {}
+
+		if self.navbar_logo:
+			navbar_values["app_logo"] = self.navbar_logo
+			website_values["app_logo"] = self.navbar_logo
+		if self.splash_page_logo:
+			website_values["splash_image"] = self.splash_page_logo
+		if self.favicon:
+			website_values["favicon"] = self.favicon
+
+		save_if_changed(website, website_values)
+		save_if_changed(navbar, navbar_values)
+
+		for key, value in (
+			("app_logo_url", self.navbar_logo),
+			("login_logo_url", self.login_page_logo),
+			("favicon", self.favicon),
+		):
+			if (frappe.conf.get(key) or None) != (value or None):
+				# the string "None" removes the key from site_config
+				update_site_config(key, value or "None")
+
+	def push_update_notifications(self):
+		"""An explicit save follows the checkbox both ways; migrate only ever turns them off."""
+		value = 1 if self.disable_new_update_popup else 0
+		save_if_changed(
+			frappe.get_single("System Settings"),
+			{"disable_system_update_notification": value, "disable_change_log_notification": value},
+		)

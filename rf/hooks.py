@@ -25,8 +25,9 @@ app_license = "mit"
 # ------------------
 
 # include js, css files in header of desk.html
-app_include_css = "/assets/rf/css/whitelabel_app.css"
-app_include_js = "/assets/rf/js/rf.js"
+# Bundles get a content-hashed URL on every build, so browsers never keep a stale copy.
+app_include_css = "whitelabel_app.bundle.css"
+app_include_js = "rf.bundle.js"
 
 # include js, css files in header of web template
 web_include_css = "/assets/rf/css/whitelabel_web.css"
@@ -44,7 +45,14 @@ extend_bootinfo = ["rf.api.extend_bootinfo"]
 
 override_whitelisted_methods = {
 	"frappe.utils.change_log.show_update_popup": "rf.api.ignore_update_popup",
+	# strips vendor "Documentation" links from doctype meta
+	"frappe.desk.form.load.getdoctype": "rf.api.getdoctype",
 }
+
+# White-label settings stored in the DB are re-applied after every migrate, which runs after
+# frappe re-syncs help rows, fixtures and onboarding JSON. Renames live in translations/en.csv.
+after_migrate = ["rf.whitelabel.apply_whitelabel"]
+after_install = "rf.whitelabel.apply_whitelabel"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/rf/css/rf.css"

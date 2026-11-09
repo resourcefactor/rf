@@ -1,0 +1,18 @@
+/* RF Whitelabel — Desk (app) styles.
+ *
+ * v16 desk white-labelling is done in rf.bundle.js (prototype patches), rf/translations/en.csv
+ * (renames) and rf/whitelabel.py (settings re-applied on every migrate).
+ */
+
+/* Catch-all for vendor links rf.bundle.js can't target one by one (dialogs such as the
+ * new-navigation prompt, field help text, links added by future releases). rf.bundle.js adds
+ * the class only when RF Settings > Hide Help Menu is on. */
+html.rf-hide-vendor-links a[href*="frappe.io"],
+html.rf-hide-vendor-links a[href*="frappe.cloud"],
+html.rf-hide-vendor-links a[href*="frappecloud.com"],
+html.rf-hide-vendor-links a[href*="frappeframework.com"],
+html.rf-hide-vendor-links a[href*="frappe.school"],
+html.rf-hide-vendor-links a[href*="erpnext.com"],
+html.rf-hide-vendor-links a[href*="github.com/frappe"] {
+	display: none !important;
+}

@@ -11,46 +11,24 @@ def boot_session(bootinfo):
 		bootinfo.rf_can_delete_company_transactions = can_delete_company_transactions()
 
 
-_HIDE_HELP_LABELS = {"About", "Frappe Support"}
-
-
 def extend_bootinfo(bootinfo):
-	"""Runs after full bootinfo (including desk_settings) is assembled."""
+	"""Runs after full bootinfo is assembled.
+
+	Help rows are not filtered here: v16 sessions.py re-reads `navbar_settings` after this hook,
+	so they are hidden on the Navbar Settings rows themselves (see rf.whitelabel).
+	"""
 	if frappe.session["user"] == "Guest":
 		return
 
 	_filter_notes_by_company(bootinfo)
-	_apply_rf_settings(bootinfo)
-
-
-def _get_label(item):
-	return item.get("item_label") if isinstance(item, dict) else getattr(item, "item_label", "")
-
-
-def _apply_rf_settings(bootinfo):
-	rf = bootinfo.get("rf_settings") or {}
-	if not rf.get("hide_help_menu"):
-		return
-
-	navbar = bootinfo.get("navbar_settings")
-	if not navbar:
-		return
-
-	if isinstance(navbar, dict):
-		navbar["help_dropdown"] = [
-			item for item in (navbar.get("help_dropdown") or [])
-			if _get_label(item) not in _HIDE_HELP_LABELS
-		]
-	else:
-		navbar.help_dropdown = [
-			item for item in (navbar.help_dropdown or [])
-			if _get_label(item) not in _HIDE_HELP_LABELS
-		]
-
 
 
 def _filter_notes_by_company(bootinfo):
 	if not bootinfo.get("notes"):
+		return
+	# The doctype is not part of this app on v16 (rfdemo has an orphan table, no DocType). Without
+	# it the get_all below raises DoesNotExistError and breaks the desk boot for every user.
+	if not frappe.db.exists("DocType", "Note Restrict Company"):
 		return
 
 	user = frappe.session.user
@@ -90,6 +68,31 @@ def get_login_logo_url():
 	"""Return login logo URL from site config (used by whitelabel_web.js on the login page)."""
 	login_logo_url = frappe.conf.get("login_logo_url")
 	return {"login_logo_url": login_logo_url if login_logo_url else None}
+
+
+@frappe.whitelist()
+def getdoctype(doctype: str, with_parent: int | bool = False):
+	"""Override of frappe.desk.form.load.getdoctype that drops vendor documentation links.
+
+	Clearing DocType `documentation` and DocField `documentation_url` removes the "Documentation"
+	items from form, list and kanban menus and the field-level "View Documentation" links, for
+	every doctype including ones added later. The dicts come from `as_dict()`, so cached meta is
+	untouched.
+	"""
+	from frappe.desk.form.load import getdoctype as frappe_getdoctype
+
+	frappe_getdoctype(doctype, with_parent=with_parent)
+
+	if not frappe.db.get_single_value("RF Settings", "hide_help_menu"):
+		return
+
+	for doc in frappe.response.get("docs") or []:
+		if not isinstance(doc, dict) or doc.get("doctype") != "DocType":
+			continue
+		doc.pop("documentation", None)
+		for field in doc.get("fields") or []:
+			if isinstance(field, dict):
+				field.pop("documentation_url", None)
 
 
 @frappe.whitelist()
