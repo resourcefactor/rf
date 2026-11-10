@@ -12,6 +12,8 @@
   "show_help_menu",
   "column_break_5",
   "disable_new_update_popup",
+  "data_import_section",
+  "allow_import_for_all_doctypes",
   "logo_settings_tab",
   "logo_setting_section",
   "navbar_logo",
@@ -193,11 +195,23 @@
    "fieldtype": "Table",
    "label": "Users Allowed to Delete Transactions",
    "options": "RF Transaction Deletion User"
+  },
+  {
+   "fieldname": "data_import_section",
+   "fieldtype": "Section Break",
+   "label": "Data Import"
+  },
+  {
+   "default": "0",
+   "description": "When checked, Data Import can be used for any DocType the user has import permission on, including core DocTypes that Frappe blocks (e.g. Property Setter) and DocTypes without \"Allow Import\" ticked. Leave unchecked for standard Frappe behaviour.",
+   "fieldname": "allow_import_for_all_doctypes",
+   "fieldtype": "Check",
+   "label": "Allow Import for All DocTypes"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-02-10 00:14:31.810695",
+ "modified": "2026-11-10 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Rf",
  "name": "Whitelabel Setting",
