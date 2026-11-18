@@ -1,5 +1,7 @@
 import frappe
 
+from rf.environment import get_environment
+
 
 def boot_session(bootinfo):
 	"""Attach RF Settings to bootinfo so the desk JS can read branding config without an extra API call."""
@@ -20,6 +22,9 @@ def extend_bootinfo(bootinfo):
 	if frappe.session["user"] == "Guest":
 		return
 
+	# Here rather than in boot_session: that hook's output is cached in Redis per user, this one
+	# runs on every desk load, so a changed environment can't get stuck in a cached boot.
+	bootinfo.rf_environment = get_environment()
 	_filter_notes_by_company(bootinfo)
 
 

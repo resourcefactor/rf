@@ -11,6 +11,11 @@
 		"whitelabel_app_name",
 		"column_break_gen_1",
 		"disable_new_update_popup",
+		"environment_section",
+		"environment",
+		"environment_label",
+		"column_break_env_1",
+		"environment_color",
 		"data_import_section",
 		"allow_import_for_all_doctypes",
 		"logo_settings_tab",
@@ -59,6 +64,36 @@
 			"fieldname": "disable_new_update_popup",
 			"fieldtype": "Check",
 			"label": "Disable System Update Notification"
+		},
+		{
+			"fieldname": "environment_section",
+			"fieldtype": "Section Break",
+			"label": "Environment"
+		},
+		{
+			"description": "Leave empty on production: no bar is shown. Any other choice shows a coloured bar across the top of the desk for every user. Saved in this site's site_config.json, not the database, so restoring another site's backup here does not change it.",
+			"fieldname": "environment",
+			"fieldtype": "Select",
+			"label": "Environment",
+			"options": "\nStaging\nUAT\nDevelopment"
+		},
+		{
+			"depends_on": "environment",
+			"description": "Leave empty to show the environment name, e.g. STAGING.",
+			"fieldname": "environment_label",
+			"fieldtype": "Data",
+			"label": "Bar Text"
+		},
+		{
+			"fieldname": "column_break_env_1",
+			"fieldtype": "Column Break"
+		},
+		{
+			"depends_on": "environment",
+			"description": "Leave empty for the default: amber for Staging, violet for UAT, blue for Development. Text turns black or white to stay readable.",
+			"fieldname": "environment_color",
+			"fieldtype": "Color",
+			"label": "Bar Color"
 		},
 		{
 			"fieldname": "logo_settings_tab",
@@ -176,7 +211,7 @@
 	],
 	"issingle": 1,
 	"links": [],
-	"modified": "2026-11-10 12:00:00.000000",
+	"modified": "2026-11-18 13:00:00.000000",
 	"modified_by": "Administrator",
 	"module": "Rf",
 	"name": "RF Settings",

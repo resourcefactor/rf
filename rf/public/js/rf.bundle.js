@@ -6,6 +6,11 @@
 // MutationObserver. App renames (ERPNext -> ERP, ...) are not done here -- they ship as
 // rf/translations/en.csv, which every `__()` render picks up. Help rows from Navbar Settings are
 // hidden or restricted to System Managers in the DB by rf.whitelabel.
+//
+// The environment bar is not white-labelling and must not depend on hide_help_menu, so it lives in
+// its own file.
+import "./environment_bar";
+
 (function () {
 	"use strict";
 

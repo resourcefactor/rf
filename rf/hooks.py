@@ -26,7 +26,7 @@ app_license = "mit"
 
 # include js, css files in header of desk.html
 # Bundles get a content-hashed URL on every build, so browsers never keep a stale copy.
-app_include_css = "whitelabel_app.bundle.css"
+app_include_css = ["whitelabel_app.bundle.css", "environment_bar.bundle.css"]
 app_include_js = "rf.bundle.js"
 
 # include js, css files in header of web template

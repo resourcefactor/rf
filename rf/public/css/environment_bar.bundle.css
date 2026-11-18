@@ -1,0 +1,62 @@
+/* RF environment bar: the full-width strip environment_bar.js draws when RF Settings sets an
+ * Environment (Production, Staging, ...).
+ *
+ * The v16 desk has no navbar. body is a flex row of [dock | sidebar | .main-section], and each of
+ * those columns is sized to the viewport (100dvh). So the bar is fixed at the top, body is pushed
+ * down by its height, and those columns shrink by the same amount: the bar covers nothing and the
+ * window itself never scrolls. Everything is keyed on `html.rf-env-bar-on`, so sites without an
+ * environment get none of it. */
+
+:root {
+	--rf-env-bar-height: 30px;
+}
+
+.rf-env-bar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: var(--rf-env-bar-height);
+	/* Under the sidebar drawer and panel (1000), dropdowns and modals, which may cover it while
+	 * they are open. */
+	z-index: 999;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0 12px;
+	background: var(--rf-env-bar-bg);
+	color: var(--rf-env-bar-fg);
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	line-height: 1;
+	user-select: none;
+}
+
+.rf-env-bar-text {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+/* !important because the desk sets `body { padding: 0 !important }` (desk/mobile.scss); this
+ * selector is more specific, so it wins. body is border-box, so its 100% height keeps fitting. */
+html.rf-env-bar-on body {
+	padding-top: var(--rf-env-bar-height) !important;
+}
+
+html.rf-env-bar-on .main-section,
+html.rf-env-bar-on body.dock-pinned .dock,
+html.rf-env-bar-on .sidebar-panel {
+	height: calc(100vh - var(--rf-env-bar-height)); /* fallback for engines without dvh */
+	height: calc(100dvh - var(--rf-env-bar-height));
+}
+
+/* Sidebar.set_height() (frappe sidebar.js), run when the mobile sidebar toggle is tapped, pins the
+ * sidebar drawer and its scrim to window.innerHeight with an inline style. Only !important beats
+ * that; without it the drawer runs off the bottom of the screen and hides the user menu. */
+html.rf-env-bar-on .body-sidebar,
+html.rf-env-bar-on .body-sidebar-container .overlay {
+	height: calc(100vh - var(--rf-env-bar-height)) !important;
+	height: calc(100dvh - var(--rf-env-bar-height)) !important;
+}

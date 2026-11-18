@@ -2,13 +2,30 @@ import frappe
 from frappe.installer import update_site_config
 from frappe.model.document import Document
 
+import rf.environment
 from rf.whitelabel import apply_whitelabel, save_if_changed
 
 
 class RFSettings(Document):
+	def load_from_db(self):
+		super().load_from_db()
+		# The environment fields belong to this site, not to its database (see rf.environment):
+		# always show and save what site_config holds, so a restored backup can't relabel the site.
+		config = rf.environment.read_config()
+		for field, key in rf.environment.SITE_CONFIG_KEYS.items():
+			self.set(field, config.get(key))
+		return self
+
+	def validate(self):
+		if not self.environment:
+			# Bar Text and Bar Color are hidden without an environment; don't keep values the user
+			# can no longer see, or they'd silently come back when an environment is picked again.
+			self.environment_label = self.environment_color = None
+
 	def on_update(self):
 		self.push_logos()
 		self.push_update_notifications()
+		self.push_environment()
 		# App name, help rows, footers, CRM rows and onboarding (also re-run after every migrate).
 		apply_whitelabel(self)
 		frappe.clear_cache()
@@ -40,6 +57,15 @@ class RFSettings(Document):
 			("favicon", self.favicon),
 		):
 			if (frappe.conf.get(key) or None) != (value or None):
+				# the string "None" removes the key from site_config
+				update_site_config(key, value or "None")
+
+	def push_environment(self):
+		"""Write the environment fields to site_config, the only place rf.environment reads them from."""
+		config = rf.environment.read_config()
+		for field, key in rf.environment.SITE_CONFIG_KEYS.items():
+			value = (self.get(field) or "").strip() or None
+			if (config.get(key) or None) != value:
 				# the string "None" removes the key from site_config
 				update_site_config(key, value or "None")
 
